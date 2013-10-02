@@ -32,7 +32,7 @@ initHashes = function() {
 	// mappings are ported from Java code
 	// *** Wylie to Unicode mappings ***
 	// list of wylie consonant => unicode
-	m_consonant = newHashMap();
+	m_consonant = new newHashMap();
 	m_consonant.put("k", 	"\u0f40");
 	m_consonant.put("kh", 	"\u0f41");
 	m_consonant.put("g", 	"\u0f42");
@@ -93,7 +93,7 @@ initHashes = function() {
 	m_consonant.put("v", 	"\u0f56\u0f39");
 
 	// subjoined letters
-	m_subjoined = newHashMap();
+	m_subjoined = new newHashMap();
 	m_subjoined.put("k", 	"\u0f90");
 	m_subjoined.put("kh", 	"\u0f91");
 	m_subjoined.put("g", 	"\u0f92");
@@ -153,7 +153,7 @@ initHashes = function() {
 	m_subjoined.put("R", 	"\u0fbc");
 
 	// vowels
-	m_vowel = newHashMap();
+	m_vowel = new newHashMap();
 	m_vowel.put("a", 	"\u0f68");
 	m_vowel.put("A", 	"\u0f71");
 	m_vowel.put("i", 	"\u0f72");
@@ -168,7 +168,7 @@ initHashes = function() {
 	m_vowel.put("-I", 	"\u0f71\u0f80");
 
 	// final symbols to unicode
-	m_final_uni = newHashMap();
+	m_final_uni = new newHashMap();
 	m_final_uni.put("M", 	"\u0f7e");
 	m_final_uni.put("~M`", 	"\u0f82");
 	m_final_uni.put("~M", 	"\u0f83");
@@ -179,7 +179,7 @@ initHashes = function() {
 	m_final_uni.put("^", 	"\u0f39");
 
 	// final symbols organized by class
-	m_final_class = newHashMap();
+	m_final_class = new newHashMap();
 	m_final_class.put("M", 	"M");
 	m_final_class.put("~M`", "M");
 	m_final_class.put("~M",  "M");
@@ -190,7 +190,7 @@ initHashes = function() {
 	m_final_class.put("^", 	"^");
 
 	// other stand-alone symbols
-	m_other = newHashMap();
+	m_other = new newHashMap();
 	m_other.put("0", 	"\u0f20");
 	m_other.put("1", 	"\u0f21");
 	m_other.put("2", 	"\u0f22");
@@ -221,7 +221,7 @@ initHashes = function() {
 	m_other.put("%", 	"\u0f07");
 
 	// special characters: flag those if they occur out of context
-	m_special = newHashSet();
+	m_special = new newHashSet();
 	m_special.add(".");
 	m_special.add("+");
 	m_special.add("-");
@@ -232,8 +232,8 @@ initHashes = function() {
 	m_special.add("]");
 
 	// superscripts: hashmap of superscript => set of letters or stacks below
-	m_superscripts = newHashMap();
-	tmpSet = newHashSet();
+	m_superscripts = new newHashMap();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -254,7 +254,7 @@ initHashes = function() {
 	tmpSet.add("g+w");
 	m_superscripts.put("r", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -267,7 +267,7 @@ initHashes = function() {
 	tmpSet.add("h");
 	m_superscripts.put("l", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -293,8 +293,8 @@ initHashes = function() {
 	m_superscripts.put("s", tmpSet);
 
 	// subscripts => set of letters above
-	m_subscripts = newHashMap();
-	tmpSet = newHashSet();
+	m_subscripts = new newHashMap();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("kh");
 	tmpSet.add("g");
@@ -312,7 +312,7 @@ initHashes = function() {
 	tmpSet.add("s+m");
 	m_subscripts.put("y", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("kh");
 	tmpSet.add("g");
@@ -336,7 +336,7 @@ initHashes = function() {
 	tmpSet.add("s+n");
 	m_subscripts.put("r", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("b");
@@ -345,7 +345,7 @@ initHashes = function() {
 	tmpSet.add("z");
 	m_subscripts.put("l", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("kh");
 	tmpSet.add("g");
@@ -370,8 +370,8 @@ initHashes = function() {
 	m_subscripts.put("w", tmpSet);
 
 	// prefixes => set of consonants or stacks after
-	m_prefixes = newHashMap();
-	tmpSet = newHashSet();
+	m_prefixes = new newHashMap();
+	tmpSet = new newHashSet();
 	tmpSet.add("c");
 	tmpSet.add("ny");
 	tmpSet.add("t");
@@ -385,7 +385,7 @@ initHashes = function() {
 	tmpSet.add("s");
 	m_prefixes.put("g", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -403,7 +403,7 @@ initHashes = function() {
 	tmpSet.add("b+r");
 	m_prefixes.put("d", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("k");
 	tmpSet.add("g");
 	tmpSet.add("c");
@@ -454,7 +454,7 @@ initHashes = function() {
 	tmpSet.add("s+w");
 	m_prefixes.put("b", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("kh");
 	tmpSet.add("g");
 	tmpSet.add("ng");
@@ -472,7 +472,7 @@ initHashes = function() {
 	tmpSet.add("g+r");
 	m_prefixes.put("m", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("kh");
 	tmpSet.add("g");
 	tmpSet.add("ch");
@@ -498,7 +498,7 @@ initHashes = function() {
 
 	// set of suffix letters
 	// also included are some Skt letters b/c they occur often in suffix position in Skt words
-	m_suffixes = newHashSet();
+	m_suffixes = new newHashSet();
 	m_suffixes.add("'");
 	m_suffixes.add("\u2018");
 	m_suffixes.add("\u2019");
@@ -517,22 +517,22 @@ initHashes = function() {
 	m_suffixes.add("-t");
 
 	// suffix2 => set of letters before
-	m_suff2 = newHashMap();
-	tmpSet = newHashSet();
+	m_suff2 = new newHashMap();
+	tmpSet = new newHashSet();
 	tmpSet.add("g");
 	tmpSet.add("ng");
 	tmpSet.add("b");
 	tmpSet.add("m");
 	m_suff2.put("s", tmpSet);
 
-	tmpSet = newHashSet();
+	tmpSet = new newHashSet();
 	tmpSet.add("n");
 	tmpSet.add("r");
 	tmpSet.add("l");
 	m_suff2.put("d", tmpSet);
 
 	// root letter index for very ambiguous three-stack syllables
-	m_ambiguous_key = newHashMap();
+	m_ambiguous_key = new newHashMap();
 	m_ambiguous_key.put("dgs", 	1);
 	m_ambiguous_key.put("dms", 	1);
 	m_ambiguous_key.put("'gs", 	1);
@@ -540,7 +540,7 @@ initHashes = function() {
 	m_ambiguous_key.put("bgs", 	0);
 	m_ambiguous_key.put("dbs", 	1);
 
-	m_ambiguous_wylie = newHashMap();
+	m_ambiguous_wylie = new newHashMap();
 	m_ambiguous_wylie.put("dgs", 	"dgas");
 	m_ambiguous_wylie.put("dms", 	"dmas");
 	m_ambiguous_wylie.put("'gs", 	"'gas");
@@ -551,7 +551,7 @@ initHashes = function() {
 	// *** Unicode to Wylie mappings ***
 
 	// top letters
-	m_tib_top = newHashMap();
+	m_tib_top = new newHashMap();
 	m_tib_top.put('\u0f40', 	"k");
 	m_tib_top.put('\u0f41', 	"kh");
 	m_tib_top.put('\u0f42', 	"g");
@@ -596,7 +596,7 @@ initHashes = function() {
 	m_tib_top.put('\u0f6a', 	"R");
 
 	// subjoined letters
-	m_tib_subjoined = newHashMap();
+	m_tib_subjoined = new newHashMap();
 	m_tib_subjoined.put('\u0f90', 	"k");
 	m_tib_subjoined.put('\u0f91', 	"kh");
 	m_tib_subjoined.put('\u0f92', 	"g");
@@ -647,7 +647,7 @@ initHashes = function() {
 	// pre-composed "I" and "U" are dealt here; other pre-composed Skt vowels are more
 	// easily handled by a global replace in toWylie(), b/c they turn into subjoined "r"/"l".
 
-	m_tib_vowel = newHashMap();
+	m_tib_vowel = new newHashMap();
 	m_tib_vowel.put('\u0f71', 	"A");
 	m_tib_vowel.put('\u0f72', 	"i");
 	m_tib_vowel.put('\u0f73', 	"I");
@@ -660,13 +660,13 @@ initHashes = function() {
 	m_tib_vowel.put('\u0f80', 	"-i");
 
 	// long (Skt) vowels
-	m_tib_vowel_long = newHashMap();
+	m_tib_vowel_long = new newHashMap();
 	m_tib_vowel_long.put("i", 	"I");
 	m_tib_vowel_long.put("u", 	"U");
 	m_tib_vowel_long.put("-i", 	"-I");
 
 	// final symbols => wylie
-	m_tib_final_wylie = newHashMap();
+	m_tib_final_wylie = new newHashMap();
 	m_tib_final_wylie.put('\u0f7e', 	"M");
 	m_tib_final_wylie.put('\u0f82', 	"~M`");
 	m_tib_final_wylie.put('\u0f83', 	"~M");
@@ -677,7 +677,7 @@ initHashes = function() {
 	m_tib_final_wylie.put('\u0f84', 	"?");
 
 	// final symbols by class
-	m_tib_final_class = newHashMap();
+	m_tib_final_class = new newHashMap();
 	m_tib_final_class.put('\u0f7e', 	"M");
 	m_tib_final_class.put('\u0f82', 	"M");
 	m_tib_final_class.put('\u0f83', 	"M");
@@ -688,12 +688,12 @@ initHashes = function() {
 	m_tib_final_class.put('\u0f84', 	"?");
 	
 	// special characters introduced by ^
-	m_tib_caret = newHashMap();
+	m_tib_caret = new newHashMap();
 	m_tib_caret.put("ph", 	"f");
 	m_tib_caret.put("b", 	"v");
 
 	// other stand-alone characters
-	m_tib_other = newHashMap();
+	m_tib_other = new newHashMap();
 	m_tib_other.put(' ', 		"_");
 	m_tib_other.put('\u0f04', 	"@");
 	m_tib_other.put('\u0f05', 	"#");
@@ -724,7 +724,7 @@ initHashes = function() {
 	m_tib_other.put('\u0f3d', 	")");
 
 	// all these stacked consonant combinations don't need "+"s in them
-	m_tib_stacks = newHashSet();
+	m_tib_stacks = new newHashSet();
 	m_tib_stacks.add("b+l");
 	m_tib_stacks.add("b+r");
 	m_tib_stacks.add("b+y");
@@ -825,7 +825,7 @@ initHashes = function() {
 	// a map used to split the input string into tokens for fromWylie().
 	// all letters which start tokens longer than one letter are mapped to the max length of
 	// tokens starting with that letter.  
-	m_tokens_start = newHashMap();
+	m_tokens_start = new newHashMap();
 	m_tokens_start.put('S', 2);
 	m_tokens_start.put('/', 2);
 	m_tokens_start.put('d', 4);
@@ -846,7 +846,7 @@ initHashes = function() {
 	m_tokens_start.put('\r', 2);
 
 	// also for tokenization - a set of tokens longer than one letter
-	m_tokens = newHashSet();
+	m_tokens = new newHashSet();
 	m_tokens.add("-d+h");
 	m_tokens.add("dz+h");
 	m_tokens.add("-dh");
@@ -914,7 +914,7 @@ fromWylieOneStack = function(tokens, i) {
 	var single_consonant = null; // did we find just a single consonant?
 	var plus = false;		// any explicit subjoining via '+'?
 	var caret = 0;			// find any '^'?
-	var final_found = newHashMap(); // keep track of finals (H, M, etc) by class
+	var final_found = new newHashMap(); // keep track of finals (H, M, etc) by class
 
 	// do we have a superscript?
 	t = tokens[i]
@@ -1072,7 +1072,7 @@ fromWylieOneStack = function(tokens, i) {
 		single_consonant = null;
 	}
 	// return the stuff as a WylieStack struct
-	var ret = WylieStack();
+	var ret = new WylieStack();
 	ret.uni_string = out;
 	ret.tokens_used = i - orig_i;
 	if (vowel_found != null) {
@@ -1109,7 +1109,10 @@ ToWylieStack = function() {
 	this.visarga = false
 	this.cons_str = ''
 	this.single_cons = ''
-	this.prefix = false, this.suffix = false, this.suff2 = false, this.dot = false
+	this.prefix = false
+	this.suffix = false
+	this.suff2 = false
+	this.dot = false
 	this.tokens_used = 0
 	this.warns = []
 	return this
@@ -1255,7 +1258,7 @@ fromWylieOneTsekbar = function(tokens, i) { // (str, int)
 	} else if (consonants.length == 3 && isPrefix(consonants[0]) &&
 	suff2("s", consonants[1]) && consonants[2].equals("s"))
 	{
-		var cc = joinStrings(consonants, "");
+		var cc = consonants.join("");
 		cc = cc.replace(/\u2018/g, '\'');
 		cc = cc.replace(/\u2019/g, '\'');	// typographical quotes
 		var expect_key = ambiguous_key(cc);
@@ -1372,6 +1375,15 @@ function validHex(t) {
 	return true;
 }
 
+warn = function(warns, str) {
+	if (warns != null) warns.push(str);
+	if (this.print_warnings) System.out.println(str);
+}
+
+// warn with line number
+warnl = function(warns, line, str) {
+	warn(warns, "line " + line + ": " + str);
+}
 	
 Wylie = function(check, check_strict, print_warnings, fix_spacing) {
 	this.check = opt(check, true)
@@ -1383,16 +1395,6 @@ Wylie = function(check, check_strict, print_warnings, fix_spacing) {
 	}
 	function opt(x, d) { if (x == undefined) return d; else return x }
 	// generate a warning if we are keeping them; prints it out if we were asked to
-	function warn(warns, str) {
-		if (warns != null) warns.push(str);
-		if (this.print_warnings) System.out.println(str);
-	}
-
-	// warn with line number
-	function warnl(warns, line, str) {
-		warn(warns, "line " + line + ": " + str);
-	}
-
 	 // handle a Wylie unicode escape, \\uxxxx or \\Uxxxxxxxx
 	function unicodeEscape(warns, line, t) { // [], int, str
 		var hex = t.substring(2);
@@ -1511,512 +1513,24 @@ Wylie = function(check, check_strict, print_warnings, fix_spacing) {
 	}
 }
 
+require('./towylie.js')
 initHashes()
-var w = new Wylie
+var w = new Wylie()
 var A = require('fs').readFileSync('test.txt').toString().split('\n')
 var pass=0, fail=0
+var pass1=0, fail1=0
 for (var i = 0; i < A.length; i++) {
 	if (A[i].charAt(0) != '#') {
 		var T = A[i].split('\t')
 		if (T.length == 6) {
 			if (w.fromWylie(T[0]) == T[1]) pass++; else fail++;
+//			try {
+			if (toWylie(T[1]) == T[0]) pass1++; else fail1++;
+//			} catch (e) {console.log(e)}
 		}
 	}
 }
 console.log('fromWylie(), pass:', pass, 'fail:', fail)
-return
-/*
-//import java.util.ArrayList;
-//import java.util.LinkedList;
-//import java.util.List;
-console.log(m_final_class.get("~X"))
-var check, check_strict, print_warnings, fix_spacing;
+console.log('toWylie(), pass:', pass1, 'fail:', fail1)
+//console.log(toWylie('ཨོཾ'))
 
-	//m_consonant, m_subjoined, m_vowel, m_final_uni, m_final_class, m_other, m_ambiguous_wylie, m_tib_vowel_long, m_tib_caret, m_tib_top, m_tib_subjoined, m_tib_vowel, m_tib_final_wylie, m_tib_final_class, m_tib_other, m_ambiguous_key, m_tokens_start, m_special, m_suffixes, m_tib_stacks, m_tokens, m_superscripts, m_subscripts, m_prefixes, m_suff2;
-
-return
-
-    // debug print
-    private void debug (String str) {
-	System.out.println(str);
-    }
-
-    // debug variable value
-    private void debugvar(Object o, String name) {
-	System.out.println(">>" + name + "<< : (" + (o == null ? "NULL" : o.toString()) + ")");
-    }
-    
-    // join a list (ArrayList or LinkedList) of strings into a single string
-    private String joinStrings(List<String> a, String sep) {
-	var out = '';
-	int len = a.size();
-
-	int i = 0;
-	for (String v : a) {
-	    out += (v);
-	    if (sep != null && i < len - 1) out += (sep);
-	    i++;
-	}
-
-	return out;
-    }
-	 
-	 
-	 
-	 
-	 
-	 
-    // Looking from i onwards within tokens, returns as many consonants as it finds,
-    // up to and not including the next vowel or punctuation.  Skips the caret "^".
-    // Returns: a string of consonants joined by "+" signs.
-    private String consonantString(String[] tokens, int i) {
-	ArrayList<String> out = new ArrayList<String>();
-	String t;
-
-	while (tokens[i] != null) {
-	    t = tokens[i++];
-	    if (t.equals("+") || t.equals("^")) continue;
-	    if (consonant(t) == null) break;
-	    out.add(t);
-	}
-
-	return joinStrings(out, "+");
-    }
-
-    // Looking from i backwards within tokens, at most up to orig_i, returns as 
-    // many consonants as it finds, up to and not including the next vowel or
-    // punctuation.  Skips the caret "^".
-    // Returns: a string of consonants (in forward order) joined by "+" signs.
-    private String consonantStringBackwards(String[] tokens, int i, int orig_i) {
-	LinkedList<String> out = new LinkedList<String>();
-	String t;
-
-	while (i >= orig_i && tokens[i] != null) {
-	    t = tokens[i--];
-	    if (t.equals("+") || t.equals("^")) continue;
-	    if (consonant(t) == null) break;
-	    out.addFirst(t);
-	}
-
-	return joinStrings(out, "+");
-    }
-
-    // Converts from Unicode strings to Wylie (EWTS) transliteration, without warnings,
-    // including escaping of non-tibetan into [comments].
-    public String toWylie(String str) {
-	return toWylie(str, null, true);
-    }
-
-    // Converts from Unicode strings to Wylie (EWTS) transliteration.
-    //
-    // Arguments are:
-    //    str   : the unicode string to be converted
-    //    escape: whether to escape non-tibetan characters according to Wylie encoding.
-    //            if escape == false, anything that is not tibetan will be just passed through.
-    //
-    // Returns: the transliterated string.
-    //
-    // To get the warnings, call getWarnings() afterwards.
-
-    public String toWylie(String str, List<String> warns, boolean escape) {
-	var out = '';
-	int line = 1;
-	int units = 0;
-
-	// globally search and replace some deprecated pre-composed Sanskrit vowels
-	str = str.replace(/\u0f76/g, "\u0fb2\u0f80");
-	str = str.replace(/\u0f77/g, "\u0fb2\u0f71\u0f80");
-	str = str.replace(/\u0f78/g, "\u0fb3\u0f80");
-	str = str.replace(/\u0f79/g, "\u0fb3\u0f71\u0f80");
-	str = str.replace(/\u0f81/g, "\u0f71\u0f80");
-
-	int i = 0;
-	int len = str.length;
-
-	// iterate over the string, codepoint by codepoint
-    ITER:
-	while (i < len) {
-	    char t = str.charAt(i);
-
-	    // found tibetan script - handle one tsekbar
-	    if (tib_top(t) != null) {
-		ToWylieTsekbar tb = toWylieOneTsekbar(str, len, i);
-		out += (tb.wylie);
-		i += tb.tokens_used;
-		units++;
-
-		for (String w : tb.warns) {
-		    warnl(warns, line, w);
-		}
-
-		if (!escape) i += handleSpaces(str, i, out);
-		continue ITER;
-	    }
-
-	    // punctuation and special stuff.  spaces are tricky:
-	    // - in non-escaping mode: spaces are not turned to '_' here (handled by handleSpaces)
-	    // - in escaping mode: don't do spaces if there is non-tibetan coming, so they become part
-	    //   of the [  escaped block].
-	    String o = tib_other(t);
-	    if (o != null && (t != ' ' || (escape && !followedByNonTibetan(str, i)))) {
-		out += (o);
-		i++;
-		units++;
-
-		if (!escape) i += handleSpaces(str, i, out);
-		continue ITER;
-	    }
-
-	    // newlines, count lines.  "\r\n" together count as one newline.
-	    if (t == '\r' || t == '\n') {
-		line++;
-		i++;
-		out += (t);
-
-		if (t == '\r' && i < len && str.charAt(i) == '\n') {
-		    i++;
-		    out += ('\n');
-		}
-		continue ITER;
-	    }
-
-	    // ignore BOM and zero-width space
-	    if (t == '\ufeff' || t == '\u200b') {
-		i++;
-		continue ITER;
-	    }
-
-	    // anything else - pass along?
-	    if (!escape) {
-		out += (t);
-		i++;
-		continue ITER;
-	    }
-
-	    // other characters in the tibetan plane, escape with \\u0fxx
-	    if (t >= '\u0f00' && t <= '\u0fff') {
-		String c = formatHex(t);
-		out += (c);
-		i++;
-
-		// warn for tibetan codepoints that should appear only after a tib_top
-		if (tib_subjoined(t) != null || tib_vowel(t) != null || tib_final_wylie(t) != null) {
-		    warnl(warns, line, "Tibetan sign " + c + " needs a top symbol to attach to.");
-		}
-
-		continue ITER;
-	    }
-
-	    // ... or escape according to Wylie:
-	    // put it in [comments], escaping [] sequences and closing at line ends
-	    out += ("[");
-
-	    while (tib_top(t) == null && (tib_other(t) == null || t == ' ') && t != '\r' && t != '\n') {
-		// \escape [opening and closing] brackets
-		if (t == '[' || t == ']') {
-		    out += ("\\");
-		    out += (t);
-
-		// unicode-escape anything in the tibetan plane (i.e characters not handled by Wylie)
-		} else if (t >= '\u0f00' && t <= '\u0fff') {
-		    out += (formatHex(t));
-
-		// and just pass through anything else!
-		} else {
-		    out += (t);
-		}
-
-		if (++i >= len) break;
-		t = str.charAt(i);
-	    }
-
-	    out += ("]");
-	}
-
-	return out;
-    }
-
-    // given a character, return a string like "\\uxxxx", with its code in hex
-    private final String formatHex(char t) {
-        // not compatible with GWT...
-	// return String.format("\\u%04x", (int)t);
-
-	var sb = '';
-	sb.append("\\u");
-	String s = Integer.toHexString((int)t);
-	for (int i = s.length; i < 4; i++) {
-	    sb.append('0');
-	}
-	sb += (s);
-	return sb;
-    }
-
-    // handles spaces (if any) in the input stream, turning them into '_'.
-    // this is abstracted out because in non-escaping mode, we only want to turn spaces into _
-    // when they come in the middle of Tibetan script.
-
-    private int handleSpaces(String str, int i, out) {
-	int found = 0;
-	int orig_i = i;
-	while (i < str.length && str.charAt(i) == ' ') {
-	    i++;
-	    found++;
-	}
-
-	if (found == 0 || i == str.length) return 0;
-
-	char t = str.charAt(i);
-	if (tib_top(t) == null && tib_other(t) == null) return 0;
-
-	// found 'found' spaces between two tibetan bits; generate the same number of '_'s
-	for (i = 0; i < found; i++) {
-	    out += ('_');
-	}
-	return found;
-    }
-
-    // for space-handling in escaping mode: is the next thing coming (after a number of spaces)
-    // some non-tibetan bit, within the same line?
-    private boolean followedByNonTibetan(String str, int i) {
-	int len = str.length;
-	while (i < len && str.charAt(i) == ' ') {
-	    i++;
-	}
-	if (i == len) return false;
-	char t = str.charAt(i);
-	return tib_top(t) == null && tib_other(t) == null && t != '\r' && t != '\n';
-    }
-
-    // Convert Unicode to Wylie: one tsekbar
-    private ToWylieTsekbar toWylieOneTsekbar(String str, int len, int i) {
-	int orig_i = i;
-	ArrayList<String> warns = new ArrayList<String>();
-	ArrayList<ToWylieStack> stacks = new ArrayList<ToWylieStack>();
-
-    ITER: 
-	while (true) {
-	    ToWylieStack st = toWylieOneStack(str, len, i);
-	    stacks.add(st);
-	    warns = warns.concat(st.warns);
-	    i += st.tokens_used;
-
-	    if (st.visarga) break ITER;
-	    if (i >= len || tib_top(str.charAt(i)) == null) break ITER;
-	}
-
-	// figure out if some of these stacks can be prefixes or suffixes (in which case
-	// they don't need their "a" vowels)
-	int last = stacks.size() - 1;
-
-	if (stacks.size() > 1 && stacks.get(0).single_cons != null) {
-
-	    // we don't count the wazur in the root stack, for prefix checking
-	    String cs = stacks.get(1).cons_str.replace(/\+w/g, "");
-
-	    if (prefix(stacks.get(0).single_cons, cs)) {
-		stacks.get(0).prefix = true;
-	    }
-	}
-
-	if (stacks.size() > 1 && stacks.get(last).single_cons != null && isSuffix(stacks.get(last).single_cons)) {
-	    stacks.get(last).suffix = true;
-	}
-
-	if (stacks.size() > 2 && stacks.get(last).single_cons != null && stacks.get(last - 1).single_cons != null &&
-	    isSuffix(stacks.get(last - 1).single_cons) && 
-	    suff2(stacks.get(last).single_cons, stacks.get(last - 1).single_cons)) {
-
-	    stacks.get(last).suff2 = true;
-	    stacks.get(last - 1).suffix = true;
-	}
-
-	// if there are two stacks and both can be prefix-suffix, then 1st is root
-	if (stacks.size() == 2 && stacks.get(0).prefix && stacks.get(1).suffix) {
-	    stacks.get(0).prefix = false;
-	}
-
-	// if there are three stacks and they can be prefix, suffix and suff2, then check w/ a table
-	if (stacks.size() == 3 && stacks.get(0).prefix && stacks.get(1).suffix && stacks.get(2).suff2) {
-		var strb = '';
-	    for (ToWylieStack st : stacks) {
-		strb.append(st.single_cons);
-	    }
-	    String ztr = strb.toString();
-	    Integer root = ambiguous_key(ztr);
-
-	    if (root == null) {
-		warns.add("Ambiguous syllable found: root consonant not known for \"" + ztr + "\".");
-		// make it up...  (ex. "mgas" for ma, ga, sa)
-		root = 1;
-	    }
-
-	    stacks.get(root).prefix = stacks.get(root).suffix = false;
-	    stacks.get(root + 1).suff2 = false;
-	}
-
-	// if the prefix together with the main stack could be mistaken for a single stack, add a "."
-	if (stacks.get(0).prefix && tib_stack(stacks.get(0).single_cons + "+" + stacks.get(1).cons_str)) {
-	    stacks.get(0).dot = true;
-	}
-
-	// put it all together
-	var out = '';
-	for (ToWylieStack st : stacks) {
-	    out += (putStackTogether(st));
-	}
-
-	ToWylieTsekbar ret = new ToWylieTsekbar();
-	ret.wylie = out;
-	ret.tokens_used = i - orig_i;
-	ret.warns = warns;
-
-	return ret;
-    }
-
-    // Unicode to Wylie: one stack at a time
-    private ToWylieStack toWylieOneStack(String str, int len, int i) {
-	int orig_i = i;
-	String ffinal = null, vowel = null, klass = null;
-
-	// split the stack into a ToWylieStack object:
-	//   - top symbol
-	//   - stacked signs (first is the top symbol again, then subscribed main characters...)
-	//   - caret (did we find a stray tsa-phru or not?)
-	//   - vowel signs (including small subscribed a-chung, "-i" Skt signs, etc)
-	//   - final stuff (including anusvara, visarga, halanta...)
-	//   - and some more variables to keep track of what has been found
-	ToWylieStack st = new ToWylieStack();
-
-	// assume: tib_top(t) exists
-	char t = str.charAt(i++);
-	st.top = tib_top(t);
-	st.stack.add(tib_top(t));
-
-	// grab everything else below the top sign and classify in various categories
-	while (i < len) {
-	    t = str.charAt(i);
-	    String o;
-	    if ((o = tib_subjoined(t)) != null) {
-		i++;
-		st.stack.add(o);
-
-		// check for bad ordering
-		if (!st.finals.isEmpty()) {
-		    st.warns.add("Subjoined sign \"" + o + "\" found after final sign \"" + ffinal + "\".");
-		} else if (!st.vowels.isEmpty()) {
-		    st.warns.add("Subjoined sign \"" + o + "\" found after vowel sign \"" + vowel + "\".");
-		}
-
-	    } else if ((o = tib_vowel(t)) != null) {
-		i++;
-		st.vowels.add(o);
-		if (vowel == null) vowel = o;
-		
-		// check for bad ordering
-		if (!st.finals.isEmpty()) {
-		    st.warns.add("Vowel sign \"" + o + "\" found after final sign \"" + ffinal + "\".");
-		}
-
-	    } else if ((o = tib_final_wylie(t)) != null) {
-		i++;
-		klass = tib_final_class(t);
-
-		if (o.equals("^")) {
-		    st.caret = true;
-
-		} else {
-		    if (o.equals("H")) st.visarga = true;
-
-		    st.finals.add(o);
-		    if (ffinal == null) ffinal = o;
-
-		    // check for invalid combinations
-		    if (st.finals_found.containsKey(klass)) {
-			st.warns.add("Final sign \"" + o + "\" should not combine with found after final sign \"" + ffinal + "\".");
-		    } else {
-			st.finals_found.put(klass, o);
-		    }
-		}
-
-	    } else {
-	      break;
-	    }
-	}
-
-	// now analyze the stack according to various rules
-
-	// a-chen with vowel signs: remove the "a" and keep the vowel signs
-	if (st.top.equals("a") && st.stack.size() == 1 && !st.vowels.isEmpty()) {
-	    st.stack.removeFirst();
-	}
-
-	// handle long vowels: A+i becomes I, etc.
-	if (st.vowels.size() > 1 && 
-	    st.vowels.get(0).equals("A") && 
-	    tib_vowel_long(st.vowels.get(1)) != null) {
-
-	    String l = tib_vowel_long(st.vowels.get(1));
-	    st.vowels.removeFirst();
-	    st.vowels.removeFirst();
-	    st.vowels.addFirst(l);
-	}
-
-	// special cases: "ph^" becomes "f", "b^" becomes "v"
-	if (st.caret && st.stack.size() == 1 && tib_caret(st.top) != null) {
-
-	    String l = tib_caret(st.top);
-	    st.top = l;
-	    st.stack.removeFirst();
-	    st.stack.addFirst(l);
-	    st.caret = false;
-	}
-
-	st.cons_str = joinStrings(st.stack, "+");
-
-	// if this is a single consonant, keep track of it (useful for prefix/suffix analysis)
-	if (st.stack.size() == 1 && 
-	    !st.stack.get(0).equals("a") && 
-	    !st.caret && 
-	    st.vowels.isEmpty() && 
-	    st.finals.isEmpty()) {
-
-	    st.single_cons = st.cons_str;
-	}
-
-	// return the analyzed stack
-	st.tokens_used = i - orig_i;
-	return st;
-    }
-
-    // Puts an analyzed stack together into Wylie output, adding an implicit "a" if needed.
-    private String putStackTogether(ToWylieStack st) {
-	var out = '';
-
-	// put the main elements together... stacked with "+" unless it's a regular stack
-	if (tib_stack(st.cons_str)) {
-	    out += (joinStrings(st.stack, ""));
-	} else {
-	    out += (st.cons_str);
-	}
-
-	// caret (tsa-phru) goes here as per some (halfway broken) Unicode specs...
-	if (st.caret) {
-	    out += ("^");
-	}
-
-	// vowels...
-	if (!st.vowels.isEmpty()) {
-	    out += (joinStrings(st.vowels, "+"));
-
-	} else if (!st.prefix && !st.suffix && !st.suff2 && 
-		   (st.cons_str.isEmpty() || st.cons_str.charAt(st.cons_str.length - 1) != 'a')) {
-	    out += ("a");
-	}
-
-	// final stuff
-	out += (joinStrings(st.finals, ""));
-	if (st.dot) out += (".");
-
-	return out;
-    }
-*/
