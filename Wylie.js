@@ -954,8 +954,8 @@ fromWylieOneStack = function(tokens, i) {
 			}
 
 			while (tokens[i] != null && tokens[i] == "^") {
-				 caret++;
-				 i++;
+				caret++;
+				i++;
 			}
 			// subjoined: rata, yata, lata, wazur.  there can be up two subjoined letters in a stack.
 			for (var z = 0; z < 2; z++) {
@@ -1395,7 +1395,7 @@ Wylie = function(check, check_strict, print_warnings, fix_spacing) {
 	}
 	function opt(x, d) { if (x == undefined) return d; else return x }
 	// generate a warning if we are keeping them; prints it out if we were asked to
-	 // handle a Wylie unicode escape, \\uxxxx or \\Uxxxxxxxx
+	// handle a Wylie unicode escape, \\uxxxx or \\Uxxxxxxxx
 	function unicodeEscape(warns, line, t) { // [], int, str
 		var hex = t.substring(2);
 		if (hex == '') return null;
@@ -1514,23 +1514,27 @@ Wylie = function(check, check_strict, print_warnings, fix_spacing) {
 }
 
 require('./towylie.js')
-initHashes()
+/*initHashes()
 var w = new Wylie()
 var A = require('fs').readFileSync('test.txt').toString().split('\n')
 var pass=0, fail=0
 var pass1=0, fail1=0
+var fails = []
 for (var i = 0; i < A.length; i++) {
 	if (A[i].charAt(0) != '#') {
 		var T = A[i].split('\t')
 		if (T.length == 6) {
 			if (w.fromWylie(T[0]) == T[1]) pass++; else fail++;
-//			try {
-			if (toWylie(T[1]) == T[0]) pass1++; else fail1++;
-//			} catch (e) {console.log(e)}
+			if (toWylie(T[1]) == T[3]) pass1++; else {
+				fail1++;
+				fails.push(T[0] + ' ' + T[1] + ' ' + toWylie(T[1]))
+			}
 		}
 	}
 }
+require('fs').writeFileSync('fail.txt', fails.join('\n'))
 console.log('fromWylie(), pass:', pass, 'fail:', fail)
 console.log('toWylie(), pass:', pass1, 'fail:', fail1)
 //console.log(toWylie('ཨོཾ'))
 
+*/
