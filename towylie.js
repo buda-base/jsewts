@@ -1,5 +1,4 @@
-﻿require('./wylie.js')
-require('./towylie.js')
+﻿require('./Wylie')
 fs=require('fs')
 initHashes()
 w = new Wylie(true, true, true, true)

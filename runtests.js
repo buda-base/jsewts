@@ -3,7 +3,7 @@ function out(s) {
 	console.log(++out_x +'\t'+ s)
 }
 
-require('./wylie.js')
+require('./Wylie.js')
 //require('./towylie.js')
 initHashes()
 var A = require('fs').readFileSync('test.txt').toString().split('\n')
