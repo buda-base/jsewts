@@ -4,7 +4,7 @@ function out(s) {
 }
 
 require('./wylie.js')
-require('./towylie.js')
+//require('./towylie.js')
 initHashes()
 var A = require('fs').readFileSync('test.txt').toString().split('\n')
 var Ai = 0
@@ -36,7 +36,7 @@ while (Ai < A.length) {
 	var s2 = w2.fromWylie(wylie, e2);
 	// re-encode into wylie
 	var e3 = [];
-	var rewylie = toWylie(s, e3, true);
+	var rewylie = w.toWylie(s, e3, true);
 	// and again back into unicode
 	var reuni = w.fromWylie(rewylie);
 	// the two first unicodes must be same
@@ -106,8 +106,3 @@ while (Ai < A.length) {
 	if (fail) fails++;
 }
 out("Finished running " + tests + " tests, " + fails + " failures.");
-/*
-}
-
-System.exit(0);
-*/

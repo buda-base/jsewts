@@ -898,11 +898,357 @@ WylieStack = function() {
 	return this
 }
 
+// Looking from i onwards within tokens, returns as many consonants as it finds,
+// up to and not including the next vowel or punctuation.  Skips the caret "^".
+// Returns: a string of consonants joined by "+" signs.
+function consonantString(tokens, i) { // strings, int
+	var out = [];
+	var t = '';
+	while (tokens[i] != null) {
+		t = tokens[i++];
+		if (t == '+' || t == '^') continue;
+		if (consonant(t) == null) break;
+		out.push(t);
+	}
+	return out.join("+");
+}
+
+// Looking from i backwards within tokens, at most up to orig_i, returns as 
+// many consonants as it finds, up to and not including the next vowel or
+// punctuation.  Skips the caret "^".
+// Returns: a string of consonants (in forward order) joined by "+" signs.
+function consonantStringBackwards(tokens, i, orig_i) {
+	var out = [];
+	var t = '';
+	while (i >= orig_i && tokens[i] != null) {
+		t = tokens[i--];
+		if (t == '+' || t == '^') continue;
+		if (consonant(t) == null) break;
+		out.unshift(t);
+	}
+	return out.join("+");
+}
+
+// A class to encapsulate the return value of fromWylieOneTsekbar.
+WylieTsekbar = function() {
+	this.uni_string = ''
+	this.tokens_used = 0
+	this.warns = []
+	return this
+}
+// A class to encapsulate an analyzed tibetan stack, while converting Unicode to Wylie.
+ToWylieStack = function() {
+	this.top = ''
+	this.stack = []
+	this.caret = false
+	this.vowels = []
+	this.finals = []
+	this.finals_found = newHashMap()
+	this.visarga = false
+	this.cons_str = ''
+	this.single_cons = ''
+	this.prefix = false
+	this.suffix = false
+	this.suff2 = false
+	this.dot = false
+	this.tokens_used = 0
+	this.warns = []
+	return this
+}
+
+// A class to encapsulate the return value of toWylieOneTsekbar.
+ToWylieTsekbar = function() {
+	this.wylie = ''
+	this.tokens_used = 0
+	this.warns = []
+	return this
+}
+
+// Converts successive stacks of Wylie into unicode, starting at the given index
+// within the array of tokens. 
+// 
+// Assumes that the first available token is valid, and is either a vowel or a consonant.
+// Returns a WylieTsekbar object
+dum = function(x) {
+	if (x == undefined) return 'undefined'
+	var s = []
+	for (var  i = 0; i < x.length; i++) {
+		s.push(x.charCodeAt(i).toString(16))
+	}
+	return s.join('+')
+}
+
+// HELPER CLASSES AND STRUCTURES
+State = { PREFIX: 0, MAIN: 1, SUFF1: 2, SUFF2: 3, NONE: 4 }
+	// split a string into Wylie tokens; 
+	// make sure there is room for at least one null element at the end of the array
+splitIntoTokens = function(str) {
+	var tokens = [] // size = str.length + 2
+	var i = 0;
+	var maxlen = str.length;
+	TOKEN:
+	while (i < maxlen) {
+		var c = str.charAt(i);
+		var mlo = m_tokens_start.get(c);
+		// if there are multi-char tokens starting with this char, try them
+		if (mlo != null) {
+			for (var len = mlo; len > 1; len--) {
+				if (i <= maxlen - len) {
+					var tr = str.substring(i, i + len);
+					if (m_tokens.contains(tr)) {
+						tokens.push(tr);
+						i += len;
+						continue TOKEN;
+					}
+				}
+			}
+		}
+		// things starting with backslash are special
+		if (c == '\\' && i <= maxlen - 2) {
+			if (str.charAt(i + 1) == 'u' && i <= maxlen - 6) {
+				tokens.push(str.substring(i, i + 6));		// \\uxxxx
+				i += 6;
+			} else if (str.charAt(i + 1) == 'U' && i <= maxlen - 10) {
+				tokens.push(str.substring(i, i + 10));		// \\Uxxxxxxxx
+				i += 10;
+			} else {
+				tokens.push(str.substring(i, i + 2));		// \\x
+				i += 2;
+			}
+			continue TOKEN;
+		}
+		// otherwise just take one char
+		tokens.push(c.toString());
+		i += 1;
+	}
+	return tokens;
+}
+
+// helper functions to access the various hash tables
+consonant = function(s) { return m_consonant.get(s) }
+subjoined = function(s) { return m_subjoined.get(s) }
+vowel = function(s) { return m_vowel.get(s) }
+final_uni = function(s) { return m_final_uni.get(s) }
+final_class = function(s) { return m_final_class.get(s) }
+other = function(s) { return m_other.get(s) }
+isSpecial = function(s) { return m_special.contains(s) }
+isSuperscript = function(s) { return m_superscripts.containsKey(s) }
+superscript = function(sup, below) {
+	var tmpSet = m_superscripts.get(sup);
+	if (tmpSet == null) return false;
+	return tmpSet.contains(below);
+}
+isSubscript = function(s) { return m_subscripts.containsKey(s) }
+subscript = function(sub, above) {
+	var tmpSet = m_subscripts.get(sub);
+	if (tmpSet == null) return false;
+	return tmpSet.contains(above);
+}
+isPrefix = function(s) { return m_prefixes.containsKey(s) }
+prefix = function(pref, after) {
+	var tmpSet = m_prefixes.get(pref);
+	if (tmpSet == null) return false;
+	return tmpSet.contains(after);
+}
+isSuffix = function(s) { return m_suffixes.contains(s) }
+isSuff2 = function(s) { return m_suff2.containsKey(s) }
+suff2 = function(suff, before) {
+	var tmpSet = m_suff2.get(suff);
+	if (tmpSet == null) return false;
+	return tmpSet.contains(before);
+}
+ambiguous_key = function(syll) { return m_ambiguous_key.get(syll) }
+ambiguous_wylie = function(syll) { return m_ambiguous_wylie.get(syll) }
+tib_top = function(c) { return m_tib_top.get(c) }
+tib_subjoined = function(c) { return m_tib_subjoined.get(c) }
+tib_vowel = function(c) { return m_tib_vowel.get(c) }
+tib_vowel_long = function(s) { return m_tib_vowel_long.get(s) }
+tib_final_wylie = function(c) { return m_tib_final_wylie.get(c) }
+tib_final_class = function(c) { return m_tib_final_class.get(c) }
+tib_caret = function(s) { return m_tib_caret.get(s) }
+tib_other = function(c) { return m_tib_other.get(c) }
+tib_stack = function(s) { return m_tib_stacks.contains(s) }
+
+// does this string consist of only hexadecimal digits?
+function validHex(t) {
+	for (var i = 0; i < t.length; i++) {
+		var c = t.charAt(i);
+		if (!((c >= 'a' && c <= 'f') || (c >= '0' && c <= '9'))) return false;
+	}
+	return true;
+}
+
+Wylie = function(check, check_strict, print_warnings, fix_spacing) {
+	this.check = opt(check, true)
+	this.check_strict = opt(check_strict, true)
+	this.print_warnings = opt(print_warnings, false)
+	this.fix_spacing = opt(fix_spacing, true)
+	if (this.check_strict && !this.check) { 
+		throw 'check_strict requires check.'
+	}
+	function opt(x, d) { if (x == undefined) return d; else return x }
+	// generate a warning if we are keeping them; prints it out if we were asked to
+	// handle a Wylie unicode escape, \\uxxxx or \\Uxxxxxxxx
+	this.unicodeEscape = function(warns, line, t) { // [], int, str
+		var hex = t.substring(2);
+		if (hex == '') return null;
+		if (!validHex(hex)) {
+			this.warnl(warns, line, "\"" + t + "\": invalid hex code.");
+			return "";
+		}
+		return String.fromCharCode(parseInt(hex, 16))
+	}
+	this.warn = function(warns, str) {
+		if (warns != null) warns.push(str);
+		if (this.print_warnings) console.log(str);
+	}
+
+	// warn with line number
+	this.warnl = function(warns, line, str) {
+		this.warn(warns, "line " + line + ": " + str);
+	}
+	
+
+this.fromWylieOneTsekbar = function(tokens, i) { // (str, int)
+	var orig_i = i
+	var t = tokens[i]
+	// variables for tracking the state within the syllable as we parse it
+	var stack = null
+	var prev_cons = ''
+	var visarga = false
+	// variables for checking the root letter, after parsing a whole tsekbar made of only single
+	// consonants and one consonant with "a" vowel
+	var check_root = true
+	var consonants = [] // strings
+	var root_idx = -1
+	var out = ''
+	var warns = []
+	// the type of token that we are expecting next in the input stream
+	//   - PREFIX : expect a prefix consonant, or a main stack
+	//   - MAIN   : expect only a main stack
+	//   - SUFF1  : expect a 1st suffix 
+	//   - SUFF2  : expect a 2nd suffix
+	//   - NONE   : expect nothing (after a 2nd suffix)
+	//
+	// the state machine is actually more lenient than this, in that a "main stack" is allowed
+	// to come at any moment, even after suffixes.  this is because such syllables are sometimes
+	// found in abbreviations or other places.  basically what we check is that prefixes and 
+	// suffixes go with what they are attached to.
+	//
+	// valid tsek-bars end in one of these states: SUFF1, SUFF2, NONE
+	var state = State.PREFIX;
+
+	// iterate over the stacks of a tsek-bar
+	STACK:
+	while (t != null && (vowel(t) != null || consonant(t) != null) && !visarga) {
+		// translate a stack
+		if (stack != null) prev_cons = stack.single_consonant;
+		stack = this.fromWylieOneStack(tokens, i);
+		i += stack.tokens_used;
+		t = tokens[i];
+		out += stack.uni_string;
+		warns = warns.concat(stack.warns);
+		visarga = stack.visarga;
+		if (!this.check) continue;
+		// check for syllable structure consistency by iterating a simple state machine
+		// - prefix consonant
+		if (state == State.PREFIX && stack.single_consonant != null) {
+			consonants.push(stack.single_consonant);
+			if (isPrefix(stack.single_consonant)) {
+			var next = t;
+			if (this.check_strict) next = consonantString(tokens, i);
+			if (next != null && !prefix(stack.single_consonant, next)) {
+				next = next.replace(/\+/g, "");
+				warns.push("Prefix \"" + stack.single_consonant + "\" does not occur before \"" + next + "\".");
+			}
+		} else {
+			warns.push("Invalid prefix consonant: \"" + stack.single_consonant + "\".");
+		}
+		state = State.MAIN;
+		// - main stack with vowel or multiple consonants
+		} else if (stack.single_consonant == null) {
+		state = State.SUFF1;
+		// keep track of the root consonant if it was a single cons with an "a" vowel
+		if (root_idx >= 0) {
+			check_root = false;
+		} else if (stack.single_cons_a != null) {
+			consonants.push(stack.single_cons_a);
+			root_idx = consonants.length - 1;
+		}
+		// - unexpected single consonant after prefix
+		} else if (state == State.MAIN) {
+			warns.push("Expected vowel after \"" + stack.single_consonant + "\".");
+			// - 1st suffix
+		} else if (state == State.SUFF1) {
+			consonants.push(stack.single_consonant);
+			// check this one only in strict mode b/c it trips on lots of Skt stuff
+			if (this.check_strict) {
+				if (!isSuffix(stack.single_consonant)) {
+					warns.push("Invalid suffix consonant: \"" + stack.single_consonant + "\".");
+				}
+			}
+			state = State.SUFF2;
+			// - 2nd suffix
+		} else if (state == State.SUFF2) {
+			consonants.push(stack.single_consonant);
+			if (isSuff2(stack.single_consonant)) {
+				if (!suff2(stack.single_consonant, prev_cons)) {
+					warns.push("Second suffix \"" + stack.single_consonant 
+					+ "\" does not occur after \"" + prev_cons + "\".");
+				}
+			} else {
+				warns.push("Invalid 2nd suffix consonant: \"" + stack.single_consonant  + "\".");
+			}
+			state = State.NONE;
+			// - more crap after a 2nd suffix
+		} else if (state == State.NONE) {
+			warns.push("Cannot have another consonant \"" + stack.single_consonant + "\" after 2nd suffix.");
+		}
+	}
+
+	if (state == State.MAIN && stack.single_consonant != null && isPrefix(stack.single_consonant)) {
+	warns.push("Vowel expected after \"" + stack.single_consonant + "\".");
+	}
+
+	// check root consonant placement only if there were no warnings so far, and the syllable 
+	// looks ambiguous.  not many checks are needed here because the previous state machine 
+	// already takes care of most illegal combinations.
+	if (this.check && warns.length == 0 && check_root && root_idx >= 0) {
+
+	// 2 letters where each could be prefix/suffix: root is 1st
+	if (consonants.length == 2 && root_idx != 0 
+	&& prefix(consonants[0], consonants[1]) && isSuffix(consonants[1]))
+	{
+		warns.push("Syllable should probably be \"" + consonants[0] + "a" + consonants[1] + "\".");
+
+		// 3 letters where 1st can be prefix, 2nd can be postfix before "s" and last is "s":
+		// use a lookup table as this is completely ambiguous.
+	} else if (consonants.length == 3 && isPrefix(consonants[0]) &&
+	suff2("s", consonants[1]) && consonants[2] == "s")
+	{
+		var cc = consonants.join("");
+		cc = cc.replace(/\u2018/g, '\'');
+		cc = cc.replace(/\u2019/g, '\'');	// typographical quotes
+		var expect_key = ambiguous_key(cc);
+//		console.log('typeof expect_key', typeof expect_key)
+		if (expect_key != null && expect_key != root_idx) {
+			warns.push("Syllable should probably be \"" + ambiguous_wylie(cc) + "\".");
+		}
+	}
+	}
+	// return the stuff as a WylieTsekbar struct
+	var ret = new WylieTsekbar();
+	ret.uni_string = out;
+	ret.tokens_used = i - orig_i;
+	ret.warns = warns;
+	return ret;
+}
+
     // Converts one stack's worth of Wylie into unicode, starting at the given index
     // within the array of tokens.
     // Assumes that the first available token is valid, and is either a vowel or a consonant.
     // Returns a WylieStack object.
-fromWylieOneStack = function(tokens, i) {
+this.fromWylieOneStack = function(tokens, i) {
 	var orig_i = i
 	var t = '', t2 = '', o = ''
 	var out = ''
@@ -963,15 +1309,15 @@ fromWylieOneStack = function(tokens, i) {
 				if (t2 != null && isSubscript(t2)) {
 					// lata does not occur below multiple consonants 
 					// (otherwise we mess up "brla" = "b.r+la")
-					if (t2 == ("l") && consonants > 1) break;
+					if (t2 == "l" && consonants > 1) break;
 					// full stack checking (disabled by "+")
 					if (this.check_strict && !plus) {
-					var prev = consonantStringBackwards(tokens, i-1, orig_i);
-					if (!subscript(t2, prev)) {
-						prev = prev.replace(/\+/g, "");
-						warns.push("Subjoined \"" + t2 + "\" not expected after \"" + prev + "\".");
-					}
-					// simple check only
+						var prev = consonantStringBackwards(tokens, i-1, orig_i);
+						if (!subscript(t2, prev)) {
+							prev = prev.replace(/\+/g, "");
+							warns.push("Subjoined \"" + t2 + "\" not expected after \"" + prev + "\".");
+						}
+						// simple check only
 					} else if (this.check) {
 						if (!subscript(t2, t) && !(z == 1 && t2 == ("w") && t == ("y"))) {
 							warns.push("Subjoined \"" + t2 + "\"not expected after \"" + t + "\".");
@@ -1091,14 +1437,113 @@ fromWylieOneStack = function(tokens, i) {
 	return ret;
 }
 
-// A class to encapsulate the return value of fromWylieOneTsekbar.
-WylieTsekbar = function() {
-	this.uni_string = ''
-	this.tokens_used = 0
-	this.warns = []
-	return this
-}
-// A class to encapsulate an analyzed tibetan stack, while converting Unicode to Wylie.
+	// Converts a Wylie (EWTS) string to unicode.  If 'warns' is not 'null', puts warnings into it.
+	this.fromWylie = function(str, warns) {
+		var out = '', line = 1, units = 0, i = 0
+		if (this.fix_spacing) { str = str.replace(/^\s+/, '') }
+		var tokens = splitIntoTokens(str);
+		ITER:while (tokens[i] != null) {
+			var t = tokens[i], o = null
+			// [non-tibetan text] : pass through, nesting brackets
+			if (t == "[") {
+				var nesting = 1;
+				i++;
+					ESC:while (tokens[i] != null) {
+					t = tokens[i++];
+					if (t == "[") nesting++;
+					if (t == "]") nesting--;
+					if (nesting == 0) continue ITER;
+					// handle unicode escapes and \1-char escapes within [comments]...
+					if (t.charAt(0) == '\\' && (t.charAt(1) == 'u' || t.charAt(1) == 'U')) {
+						o = this.unicodeEscape(warns, line, t);
+						if (o != null) {
+							out += o;
+							continue ESC;
+						}
+					}
+					if (t.charAt(0) == '\\') {
+						o = t.substring(1);
+					} else {
+						o = t;
+					}
+					out += o;
+				}
+				this.warnl(warns, line, "Unfinished [non-Wylie stuff].");
+				break ITER;
+			}
+			// punctuation, numbers, etc
+			o = other(t);
+			if (o != null) {
+				out += o;
+				i++;
+				units++;
+				// collapse multiple spaces?
+				if (t == " " && this.fix_spacing) {
+					while (tokens[i] != null && tokens[i] == " ") i++;
+				}
+				continue ITER;
+			}
+			// vowels & consonants: process tibetan script up to a tsek, punctuation or line noise
+			if (vowel(t) != null || consonant(t) != null) {
+				var tb = this.fromWylieOneTsekbar(tokens, i);
+				var word = '';
+				for (var j = 0; j < tb.tokens_used; j++) {
+					word += (tokens[i+j]);
+				}
+				out += tb.uni_string;
+				i += tb.tokens_used;
+				units++;
+				for (var w = 0; w < tb.warns.length; w++) {
+					this.warnl(warns, line, "\"" + word + "\": " + tb.warns[w]);
+				}
+				continue ITER;
+			}
+			// *** misc unicode and line handling stuff ***
+			// ignore BOM and zero-width space
+			if (t == "\ufeff" || t == "\u200b") {
+				i++;
+				continue ITER;
+			}
+			// \\u, \\U unicode characters
+			if (t.charAt(0) == '\\' && (t.charAt(1) == 'u' || t.charAt(1) == 'U')) {
+				o = this.unicodeEscape(warns, line, t);
+				if (o != null) {
+					i++;
+					out += o;
+					continue ITER;
+				}
+			}
+			// backslashed characters
+			if (t.charAt(0) == '\\') {
+				out += t.substring(1);
+				i++;
+				continue ITER;
+			}
+			// count lines
+			if (t == "\r\n" || t == "\n" || t == "\r") {
+				line++;
+				out += t;
+				i++;
+				// also eat spaces after newlines (optional)
+				if (this.fix_spacing) {
+					while (tokens[i] != null && tokens[i] == " ") i++;
+				}
+				continue ITER;
+			}
+			// stuff that shouldn't occur out of context: special chars and remaining [a-zA-Z]
+			var c = t.charAt(0);
+			if (isSpecial(t) || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+				this.warnl(warns, line, "Unexpected character \"" + t + "\".");
+			}
+			// anything else: pass through
+			out += t;
+			i++;
+		}
+		if (units == 0) this.warn(warns, "No Tibetan characters found!");
+		return out
+	}
+	
+	// A class to encapsulate an analyzed tibetan stack, while converting Unicode to Wylie.
 ToWylieStack = function() {
 	this.top = ''
 	this.stack = []
@@ -1126,415 +1571,321 @@ ToWylieTsekbar = function() {
 	return this
 }
 
-
-
-// Converts successive stacks of Wylie into unicode, starting at the given index
-// within the array of tokens. 
-// 
-// Assumes that the first available token is valid, and is either a vowel or a consonant.
-// Returns a WylieTsekbar object
-dum = function(x) {
-	if (x == undefined) return 'undefined'
-	var s = []
-	for (var  i = 0; i < x.length; i++) {
-		s.push(x.charCodeAt(i).toString(16))
+	// given a character, return a string like "\\uxxxx", with its code in hex
+function formatHex(t) { //char
+		// not compatible with GWT...
+		// return String.format("\\u%04x", (int)t);
+		var sb = '';
+		sb += '\\u';
+		var s = t.charCodeAt(0).toString(16);
+		for (var i = s.length; i < 4; i++) sb += '0';
+		sb += s;
+		return sb;
 	}
-	return s.join('+')
+
+	// handles spaces (if any) in the input stream, turning them into '_'.
+	// this is abstracted out because in non-escaping mode, we only want to turn spaces into _
+	// when they come in the middle of Tibetan script.
+function handleSpaces(str, i, out) { //return int
+	var found = 0;
+	var orig_i = i;
+	while (i < str.length && str.charAt(i) == ' ') {
+		i++;
+		found++;
+	}
+	if (found == 0 || i == str.length) return 0;
+	var t = str.charAt(i);
+	if (tib_top(t) == null && tib_other(t) == null) return 0;
+	// found 'found' spaces between two tibetan bits; generate the same number of '_'s
+	for (i = 0; i < found; i++) out += '_';
+	return found;
 }
-fromWylieOneTsekbar = function(tokens, i) { // (str, int)
-	var orig_i = i
-	var t = tokens[i]
-	// variables for tracking the state within the syllable as we parse it
-	var stack = null
-	var prev_cons = ''
-	var visarga = false
-	// variables for checking the root letter, after parsing a whole tsekbar made of only single
-	// consonants and one consonant with "a" vowel
-	var check_root = true
-	var consonants = [] // strings
-	var root_idx = -1
+
+// for space-handling in escaping mode: is the next thing coming (after a number of spaces)
+// some non-tibetan bit, within the same line?
+function followedByNonTibetan(str, i) {
+	var len = str.length;
+	while (i < len && str.charAt(i) == ' ') i++;
+	if (i == len) return false;
+	var t = str.charAt(i);
+	return tib_top(t) == null && tib_other(t) == null && t != '\r' && t != '\n';
+}
+
+// Convert Unicode to Wylie: one tsekbar
+function toWylieOneTsekbar(str, len, i) {
+	var orig_i = i;
+	var warns = [];
+	var stacks = [];// ArrayList<ToWylieStack>;
+	ITER: 
+	while (true) {
+		var st = toWylieOneStack(str, len, i);
+		stacks.push(st);
+		warns = warns.concat(st.warns);
+		i += st.tokens_used;
+		if (st.visarga) break ITER;
+		if (i >= len || tib_top(str.charAt(i)) == null) break ITER;
+	}
+	// figure out if some of these stacks can be prefixes or suffixes (in which case
+	// they don't need their "a" vowels)
+	var last = stacks.length - 1;
+	if (stacks.length > 1 && stacks[0].single_cons != null) {
+		// we don't count the wazur in the root stack, for prefix checking
+		var cs = stacks[1].cons_str.replace(/\+w/g, "")
+		if (prefix(stacks[0].single_cons, cs)) stacks[0].prefix = true;
+	}
+	if (stacks.length > 1 && stacks[last].single_cons != null 
+	&& isSuffix(stacks[last].single_cons)) {
+		stacks[last].suffix = true;
+	}
+	if (stacks.length > 2 && stacks[last].single_cons != null 
+	&& stacks[last - 1].single_cons != null
+	&& isSuffix(stacks[last - 1].single_cons)
+	&& suff2(stacks[last].single_cons, stacks[last - 1].single_cons)) {
+		stacks[last].suff2 = true;
+		stacks[last - 1].suffix = true;
+	}
+	// if there are two stacks and both can be prefix-suffix, then 1st is root
+	if (stacks.length == 2 && stacks[0].prefix && stacks[1].suffix) {
+	    stacks[0].prefix = false;
+	}
+	// if there are three stacks and they can be prefix, suffix and suff2, then check w/ a table
+	if (stacks.length == 3 && stacks[0].prefix && stacks[1].suffix && stacks[2].suff2) {
+		var strb = []
+		for (var si = 0; si < stacks.length; si++) strb.push(stacks[si].single_cons)
+		var ztr = strb.join('')
+		var root = ambiguous_key(ztr)
+		if (root == null) {
+			warns.push("Ambiguous syllable found: root consonant not known for \"" + ztr + "\".")
+			// make it up...  (ex. "mgas" for ma, ga, sa)
+			root = 1
+		}
+		stacks[root].prefix = stacks[root].suffix = false
+		stacks[root + 1].suff2 = false
+	}
+	// if the prefix together with the main stack could be mistaken for a single stack, add a "."
+	if (stacks[0].prefix && tib_stack(stacks[0].single_cons + "+" + stacks[1].cons_str)) 
+		stacks[0].dot = true;
+	// put it all together
 	var out = ''
-	var warns = []
-	// the type of token that we are expecting next in the input stream
-	//   - PREFIX : expect a prefix consonant, or a main stack
-	//   - MAIN   : expect only a main stack
-	//   - SUFF1  : expect a 1st suffix 
-	//   - SUFF2  : expect a 2nd suffix
-	//   - NONE   : expect nothing (after a 2nd suffix)
-	//
-	// the state machine is actually more lenient than this, in that a "main stack" is allowed
-	// to come at any moment, even after suffixes.  this is because such syllables are sometimes
-	// found in abbreviations or other places.  basically what we check is that prefixes and 
-	// suffixes go with what they are attached to.
-	//
-	// valid tsek-bars end in one of these states: SUFF1, SUFF2, NONE
-	var state = State.PREFIX;
-
-	// iterate over the stacks of a tsek-bar
-	STACK:
-	while (t != null && (vowel(t) != null || consonant(t) != null) && !visarga) {
-		// translate a stack
-		if (stack != null) prev_cons = stack.single_consonant;
-		stack = fromWylieOneStack(tokens, i);
-		i += stack.tokens_used;
-		t = tokens[i];
-		out += stack.uni_string;
-		warns = warns.concat(stack.warns);
-		visarga = stack.visarga;
-		if (!this.check) continue;
-		// check for syllable structure consistency by iterating a simple state machine
-		// - prefix consonant
-		if (state == State.PREFIX && stack.single_consonant != null) {
-			consonants.push(stack.single_consonant);
-			if (isPrefix(stack.single_consonant)) {
-			var next = t;
-			if (this.check_strict) next = consonantString(tokens, i);
-			if (next != null && !prefix(stack.single_consonant, next)) {
-				next = next.replace(/\+/g, "");
-				warns.push("Prefix \"" + stack.single_consonant + "\" does not occur before \"" + next + "\".");
-			}
-		} else {
-			warns.push("Invalid prefix consonant: \"" + stack.single_consonant + "\".");
-		}
-		state = State.MAIN;
-		// - main stack with vowel or multiple consonants
-		} else if (stack.single_consonant == null) {
-		state = State.SUFF1;
-		// keep track of the root consonant if it was a single cons with an "a" vowel
-		if (root_idx >= 0) {
-			check_root = false;
-		} else if (stack.single_cons_a != null) {
-			consonants.push(stack.single_cons_a);
-			root_idx = consonants.length - 1;
-		}
-		// - unexpected single consonant after prefix
-		} else if (state == State.MAIN) {
-			warns.push("Expected vowel after \"" + stack.single_consonant + "\".");
-			// - 1st suffix
-		} else if (state == State.SUFF1) {
-			consonants.push(stack.single_consonant);
-			// check this one only in strict mode b/c it trips on lots of Skt stuff
-			if (this.check_strict) {
-				if (!isSuffix(stack.single_consonant)) {
-					warns.push("Invalid suffix consonant: \"" + stack.single_consonant + "\".");
-				}
-			}
-			state = State.SUFF2;
-			// - 2nd suffix
-		} else if (state == State.SUFF2) {
-			consonants.push(stack.single_consonant);
-			if (isSuff2(stack.single_consonant)) {
-				if (!suff2(stack.single_consonant, prev_cons)) {
-					warns.push("Second suffix \"" + stack.single_consonant 
-					+ "\" does not occur after \"" + prev_cons + "\".");
-				}
-			} else {
-				warns.push("Invalid 2nd suffix consonant: \"" + stack.single_consonant  + "\".");
-			}
-			state = State.NONE;
-			// - more crap after a 2nd suffix
-		} else if (state == State.NONE) {
-			warns.push("Cannot have another consonant \"" + stack.single_consonant + "\" after 2nd suffix.");
-		}
-	}
-
-	if (state == State.MAIN && stack.single_consonant != null && isPrefix(stack.single_consonant)) {
-	warns.push("Vowel expected after \"" + stack.single_consonant + "\".");
-	}
-
-	// check root consonant placement only if there were no warnings so far, and the syllable 
-	// looks ambiguous.  not many checks are needed here because the previous state machine 
-	// already takes care of most illegal combinations.
-	if (this.check && warns.size() == 0 && check_root && root_idx >= 0) {
-
-	// 2 letters where each could be prefix/suffix: root is 1st
-	if (consonants.length == 2 && root_idx != 0 
-	&& prefix(consonants[0], consonants[1]) && isSuffix(consonants[1]))
-	{
-		warns.push("Syllable should probably be \"" + consonants[0] + "a" + consonants[1] + "\".");
-
-		// 3 letters where 1st can be prefix, 2nd can be postfix before "s" and last is "s":
-		// use a lookup table as this is completely ambiguous.
-	} else if (consonants.length == 3 && isPrefix(consonants[0]) &&
-	suff2("s", consonants[1]) && consonants[2].equals("s"))
-	{
-		var cc = consonants.join("");
-		cc = cc.replace(/\u2018/g, '\'');
-		cc = cc.replace(/\u2019/g, '\'');	// typographical quotes
-		var expect_key = ambiguous_key(cc);
-		if (expect_key != null && expect_key.intValue() != root_idx) {
-			warns.push("Syllable should probably be \"" + ambiguous_wylie(cc) + "\".");
-		}
-	}
-	}
-	// return the stuff as a WylieTsekbar struct
-	var ret = new WylieTsekbar();
-	ret.uni_string = out;
+	for (var si = 0; si < stacks.length; si++) out += putStackTogether(stacks[si])
+	var ret = ToWylieTsekbar();
+	ret.wylie = out;
 	ret.tokens_used = i - orig_i;
 	ret.warns = warns;
 	return ret;
 }
-
-// HELPER CLASSES AND STRUCTURES
-State = { PREFIX: 0, MAIN: 1, SUFF1: 2, SUFF2: 3, NONE: 4 }
-	// split a string into Wylie tokens; 
-	// make sure there is room for at least one null element at the end of the array
-splitIntoTokens = function(str) {
-	var tokens = [] // size = str.length + 2
-	var i = 0;
-	var maxlen = str.length;
-	TOKEN:
-	while (i < maxlen) {
-		var c = str.charAt(i);
-		var mlo = m_tokens_start.get(c);
-		// if there are multi-char tokens starting with this char, try them
-		if (mlo != null) {
-			for (var len = mlo; len > 1; len--) {
-				if (i <= maxlen - len) {
-					var tr = str.substring(i, i + len);
-					if (m_tokens.contains(tr)) {
-						tokens.push(tr);
-						i += len;
-						continue TOKEN;
-					}
-				}
+	 
+// Unicode to Wylie: one stack at a time
+function toWylieOneStack(str, len, i) {
+	var orig_i = i;
+	var ffinal = null, vowel = null, klass = null;
+	// split the stack into a ToWylieStack object:
+	//   - top symbol
+	//   - stacked signs (first is the top symbol again, then subscribed main characters...)
+	//   - caret (did we find a stray tsa-phru or not?)
+	//   - vowel signs (including small subscribed a-chung, "-i" Skt signs, etc)
+	//   - final stuff (including anusvara, visarga, halanta...)
+	//   - and some more variables to keep track of what has been found
+	var st = new ToWylieStack();
+	// assume: tib_top(t) exists
+	var t = str.charAt(i++);
+	st.top = tib_top(t);
+	st.stack.push(tib_top(t));
+	// grab everything else below the top sign and classify in various categories
+	while (i < len) {
+		t = str.charAt(i);
+		var o;
+		if ((o = tib_subjoined(t)) != null) {
+			i++;
+			st.stack.push(o);
+			// check for bad ordering
+			if (st.finals.length > 0) {
+				st.warns.push("Subjoined sign \"" + o + "\" found after final sign \"" + ffinal + "\".");
+			} else if (st.vowels.length > 0) {
+				st.warns.push("Subjoined sign \"" + o + "\" found after vowel sign \"" + vowel + "\".");
 			}
-		}
-		// things starting with backslash are special
-		if (c == '\\' && i <= maxlen - 2) {
-			if (str.charAt(i + 1) == 'u' && i <= maxlen - 6) {
-				tokens.push(str.substring(i, i + 6));		// \\uxxxx
-				i += 6;
-			} else if (str.charAt(i + 1) == 'U' && i <= maxlen - 10) {
-				tokens.push(str.substring(i, i + 10));		// \\Uxxxxxxxx
-				i += 10;
+		} else if ((o = tib_vowel(t)) != null) {
+			i++;
+			st.vowels.push(o);
+			if (vowel == null) vowel = o;
+			// check for bad ordering
+			if (st.finals.length > 0) {
+				st.warns.push("Vowel sign \"" + o + "\" found after final sign \"" + ffinal + "\".");
+			}
+		} else if ((o = tib_final_wylie(t)) != null) {
+			i++;
+			klass = tib_final_class(t);
+			if (o == "^") {
+				st.caret = true;
 			} else {
-				tokens.push(str.substring(i, i + 2));		// \\x
-				i += 2;
-			}
-			continue TOKEN;
-		}
-		// otherwise just take one char
-		tokens.push(c.toString());
-		i += 1;
-	}
-	return tokens;
-}
-
-// helper functions to access the various hash tables
-consonant = function(s) { return m_consonant.get(s) }
-subjoined = function(s) { return m_subjoined.get(s) }
-vowel = function(s) { return m_vowel.get(s) }
-final_uni = function(s) { return m_final_uni.get(s) }
-final_class = function(s) { return m_final_class.get(s) }
-other = function(s) { return m_other.get(s) }
-isSpecial = function(s) { return m_special.contains(s) }
-isSuperscript = function(s) { return m_superscripts.containsKey(s) }
-superscript = function(sup, below) {
-	var tmpSet = m_superscripts.get(sup);
-	if (tmpSet == null) return false;
-	return tmpSet.contains(below);
-}
-isSubscript = function(s) { return m_subscripts.containsKey(s) }
-subscript = function(sub, above) {
-	var tmpSet = m_subscripts.get(sub);
-	if (tmpSet == null) return false;
-	return tmpSet.contains(above);
-}
-isPrefix = function(s) { return m_prefixes.containsKey(s) }
-prefix = function(pref, after) {
-	var tmpSet = m_prefixes.get(pref);
-	if (tmpSet == null) return false;
-	return tmpSet.contains(after);
-}
-isSuffix = function(s) { return m_suffixes.contains(s) }
-isSuff2 = function(s) { return m_suff2.containsKey(s) }
-suff2 = function(suff, before) {
-	var tmpSet = m_suff2.get(suff);
-	if (tmpSet == null) return false;
-	return tmpSet.contains(before);
-}
-ambiguous_key = function(syll) { return m_ambiguous_key.get(syll) }
-ambiguous_wylie = function(syll) { return m_ambiguous_wylie.get(syll) }
-tib_top = function(c) { return m_tib_top.get(c) }
-tib_subjoined = function(c) { return m_tib_subjoined.get(c) }
-tib_vowel = function(c) { return m_tib_vowel.get(c) }
-tib_vowel_long = function(s) { return m_tib_vowel_long.get(s) }
-tib_final_wylie = function(c) { return m_tib_final_wylie.get(c) }
-tib_final_class = function(c) { return m_tib_final_class.get(c) }
-tib_caret = function(s) { return m_tib_caret.get(s) }
-tib_other = function(c) { return m_tib_other.get(c) }
-tib_stack = function(s) { return m_tib_stacks.contains(s) }
-
-// does this string consist of only hexadecimal digits?
-function validHex(t) {
-	for (var i = 0; i < t.length; i++) {
-		var c = t.charAt(i);
-		if (!((c >= 'a' && c <= 'f') || (c >= '0' && c <= '9'))) return false;
-	}
-	return true;
-}
-
-warn = function(warns, str) {
-	if (warns != null) warns.push(str);
-	if (this.print_warnings) System.out.println(str);
-}
-
-// warn with line number
-warnl = function(warns, line, str) {
-	warn(warns, "line " + line + ": " + str);
-}
-	
-Wylie = function(check, check_strict, print_warnings, fix_spacing) {
-	this.check = opt(check, true)
-	this.check_strict = opt(check_strict, true)
-	this.print_warnings = opt(print_warnings, false)
-	this.fix_spacing = opt(fix_spacing, true)
-	if (this.check_strict && !this.check) { 
-		throw 'check_strict requires check.'
-	}
-	function opt(x, d) { if (x == undefined) return d; else return x }
-	// generate a warning if we are keeping them; prints it out if we were asked to
-	// handle a Wylie unicode escape, \\uxxxx or \\Uxxxxxxxx
-	function unicodeEscape(warns, line, t) { // [], int, str
-		var hex = t.substring(2);
-		if (hex == '') return null;
-		if (!validHex(hex)) {
-			warnl(warns, line, "\"" + t + "\": invalid hex code.");
-			return "";
-		}
-		return String.fromCharCode(parseInt(hex, 16))
-	}
-
-	// Converts a Wylie (EWTS) string to unicode.  If 'warns' is not 'null', puts warnings into it.
-	this.fromWylie = function(str, warns) {
-		var out = '', line = 1, units = 0, i = 0
-		if (this.fix_spacing) { str = str.replace(/^\s+/, '') }
-		var tokens = splitIntoTokens(str);
-		ITER:while (tokens[i] != null) {
-			var t = tokens[i], o = null
-			// [non-tibetan text] : pass through, nesting brackets
-			if (t == "[") {
-				var nesting = 1;
-				i++;
-					ESC:while (tokens[i] != null) {
-					t = tokens[i++];
-					if (t == "[") nesting++;
-					if (t == "]") nesting--;
-					if (nesting == 0) continue ITER;
-					// handle unicode escapes and \1-char escapes within [comments]...
-					if (t.charAt(0) == '\\' && (t.charAt(1) == 'u' || t.charAt(1) == 'U')) {
-						o = unicodeEscape(warns, line, t);
-						if (o != null) {
-							out += o;
-							continue ESC;
-						}
-					}
-					if (t.charAt(0) == '\\') {
-						o = t.substring(1);
-					} else {
-						o = t;
-					}
-					out += o;
+				if (o == "H") st.visarga = true;
+				st.finals.push(o);
+				if (ffinal == null) ffinal = o;
+				// check for invalid combinations
+				if (st.finals_found.containsKey(klass)) {
+					st.warns.push("Final sign \"" + o 
+					+ "\" should not combine with found after final sign \"" + ffinal + "\".");
+				} else {
+					st.finals_found.put(klass, o);
 				}
-				warnl(warns, line, "Unfinished [non-Wylie stuff].");
-				break ITER;
 			}
-			// punctuation, numbers, etc
-			o = other(t);
-			if (o != null) {
+		} else break;
+	}
+	// now analyze the stack according to various rules
+	// a-chen with vowel signs: remove the "a" and keep the vowel signs
+	if (st.top == "a" && st.stack.length == 1 && st.vowels.length > 0) st.stack.shift();
+	// handle long vowels: A+i becomes I, etc.
+	if (st.vowels.length > 1 && st.vowels[0] == "A" && tib_vowel_long(st.vowels[1]) != null) {
+		var l = tib_vowel_long(st.vowels[1]);
+		st.vowels.shift();
+		st.vowels.shift();
+		st.vowels.unshift(l);
+	}
+	// special cases: "ph^" becomes "f", "b^" becomes "v"
+	if (st.caret && st.stack.length == 1 && tib_caret(st.top) != null) {
+		var l = tib_caret(st.top);
+		st.top = l;
+		st.stack.shift();
+		st.stack.unshift(l);
+		st.caret = false;
+	}
+	st.cons_str = st.stack.join("+");
+	// if this is a single consonant, keep track of it (useful for prefix/suffix analysis)
+	if (st.stack.length == 1 && st.stack[0] != ("a") && !st.caret 
+	&& st.vowels.length == 0 && st.finals.length == 0) {
+		st.single_cons = st.cons_str;
+	}
+	// return the analyzed stack
+	st.tokens_used = i - orig_i;
+	return st;
+}
+
+// Puts an analyzed stack together into Wylie output, adding an implicit "a" if needed.
+function putStackTogether(st) {
+	var out = '';
+	// put the main elements together... stacked with "+" unless it's a regular stack
+	if (tib_stack(st.cons_str)) {
+	    out += st.stack.join("");
+	} else out += (st.cons_str);
+	// caret (tsa-phru) goes here as per some (halfway broken) Unicode specs...
+	if (st.caret) out += ("^");
+	// vowels...
+	if (st.vowels.length > 0) {
+		out += st.vowels.join("+");
+	} else if (!st.prefix && !st.suffix && !st.suff2
+	&& (st.cons_str.length == 0 || st.cons_str.charAt(st.cons_str.length - 1) != 'a')) {
+		out += ("a");
+	}
+	// final stuff
+	out += st.finals.join("");
+	if (st.dot) out += (".");
+	return out;
+}
+
+	// Converts from Unicode strings to Wylie (EWTS) transliteration.
+	//
+	// Arguments are:
+	//    str   : the unicode string to be converted
+	//    escape: whether to escape non-tibetan characters according to Wylie encoding.
+	//            if escape == false, anything that is not tibetan will be just passed through.
+	//
+	// Returns: the transliterated string.
+	//
+	// To get the warnings, call getWarnings() afterwards.
+
+	this.toWylie = function(str, warns, escape) {
+		if (escape == undefined) escape = true
+		var out = ''
+		var line = 1
+		var units = 0
+		// globally search and replace some deprecated pre-composed Sanskrit vowels
+		str = str.replace(/\u0f76/g, "\u0fb2\u0f80")
+		str = str.replace(/\u0f77/g, "\u0fb2\u0f71\u0f80")
+		str = str.replace(/\u0f78/g, "\u0fb3\u0f80")
+		str = str.replace(/\u0f79/g, "\u0fb3\u0f71\u0f80")
+		str = str.replace(/\u0f81/g, "\u0f71\u0f80")
+		var i = 0
+		var len = str.length
+		// iterate over the string, codepoint by codepoint
+		ITER:
+		while (i < len) {
+			var t = str.charAt(i);
+			// found tibetan script - handle one tsekbar
+			if (tib_top(t) != null) {
+				var tb = toWylieOneTsekbar(str, len, i);
+				out += tb.wylie;
+				i += tb.tokens_used;
+				units++;
+				for (var w = 0; w < tb.warns.length; w++) this.warnl(warns, line, tb.warns[w]);
+				if (!escape) i += handleSpaces(str, i, out);
+				continue ITER;
+			}
+			// punctuation and special stuff. spaces are tricky:
+			// - in non-escaping mode: spaces are not turned to '_' here (handled by handleSpaces)
+			// - in escaping mode: don't do spaces if there is non-tibetan coming, so they become part
+			//   of the [escaped block].
+			var o = tib_other(t);
+			if (o != null && (t != ' ' || (escape && !followedByNonTibetan(str, i)))) {
 				out += o;
 				i++;
 				units++;
-				// collapse multiple spaces?
-				if (t == " " && this.fix_spacing) {
-					while (tokens[i] != null && tokens[i] == " ") i++;
-				}
+				if (!escape) i += handleSpaces(str, i, out);
 				continue ITER;
 			}
-			// vowels & consonants: process tibetan script up to a tsek, punctuation or line noise
-			if (vowel(t) != null || consonant(t) != null) {
-				var tb = fromWylieOneTsekbar(tokens, i);
-				var word = '';
-				for (var j = 0; j < tb.tokens_used; j++) {
-					word += (tokens[i+j]);
-				}
-				out += tb.uni_string;
-				i += tb.tokens_used;
-				units++;
-				for (var w = 0; w < tb.warns.length; w++) {
-					warnl(warns, line, "\"" + word + "\": " + tb.warns[w]);
-				}
-				continue ITER;
-			}
-			// *** misc unicode and line handling stuff ***
-			// ignore BOM and zero-width space
-			if (t == "\ufeff" || t == "\u200b") {
-				i++;
-				continue ITER;
-			}
-			// \\u, \\U unicode characters
-			if (t.charAt(0) == '\\' && (t.charAt(1) == 'u' || t.charAt(1) == 'U')) {
-				o = unicodeEscape(warns, line, t);
-				if (o != null) {
-					i++;
-					out += o;
-					continue ITER;
-				}
-			}
-			// backslashed characters
-			if (t.charAt(0) == '\\') {
-				out += t.substring(1);
-				i++;
-				continue ITER;
-			}
-			// count lines
-			if (t == "\r\n" || t == "\n" || t == "\r") {
+			// newlines, count lines.  "\r\n" together count as one newline.
+			if (t == '\r' || t == '\n') {
 				line++;
-				out += t;
 				i++;
-				// also eat spaces after newlines (optional)
-				if (this.fix_spacing) {
-					while (tokens[i] != null && tokens[i] == " ") i++;
+				out += t;
+				if (t == '\r' && i < len && str.charAt(i) == '\n') {
+					i++;
+					out += ('\n');
 				}
 				continue ITER;
 			}
-			// stuff that shouldn't occur out of context: special chars and remaining [a-zA-Z]
-			var c = t.charAt(0);
-			if (isSpecial(t) || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-				warnl(warns, line, "Unexpected character \"" + t + "\".");
+			// ignore BOM and zero-width space
+			if (t == '\ufeff' || t == '\u200b') {
+				i++;
+				continue ITER;
 			}
-			// anything else: pass through
-			out += t;
-			i++;
+			// anything else - pass along?
+			if (!escape) {
+				out += (t);
+				i++;
+				continue ITER;
+			}
+			// other characters in the tibetan plane, escape with \\u0fxx
+			if (t >= '\u0f00' && t <= '\u0fff') {
+				var c = formatHex(t);
+				out += c;
+				i++;
+				// warn for tibetan codepoints that should appear only after a tib_top
+				if (tib_subjoined(t) != null || tib_vowel(t) != null || tib_final_wylie(t) != null) {
+					this.warnl(warns, line, "Tibetan sign " + c + " needs a top symbol to attach to.");
+				}
+				continue ITER;
+			}
+			// ... or escape according to Wylie:
+			// put it in [comments], escaping [] sequences and closing at line ends
+			out += "[";
+			while (tib_top(t) == null && (tib_other(t) == null || t == ' ') && t != '\r' && t != '\n') {
+				// \escape [opening and closing] brackets
+				if (t == '[' || t == ']') {
+					out += "\\";
+					out += t;
+				// unicode-escape anything in the tibetan plane (i.e characters not handled by Wylie)
+				} else if (t >= '\u0f00' && t <= '\u0fff') {
+					out += formatHex(t);
+					// and just pass through anything else!
+				} else {
+					out += t;
+				}
+				if (++i >= len) break;
+				t = str.charAt(i);
+			}
+			 out += "]";
 		}
-		if (units == 0) warn(warns, "No Tibetan characters found!");
-		return out
+		return out;
 	}
 }
 
-require('./towylie.js')
-/*initHashes()
-var w = new Wylie()
-var A = require('fs').readFileSync('test.txt').toString().split('\n')
-var pass=0, fail=0
-var pass1=0, fail1=0
-var fails = []
-for (var i = 0; i < A.length; i++) {
-	if (A[i].charAt(0) != '#') {
-		var T = A[i].split('\t')
-		if (T.length == 6) {
-			if (w.fromWylie(T[0]) == T[1]) pass++; else fail++;
-			if (toWylie(T[1]) == T[3]) pass1++; else {
-				fail1++;
-				fails.push(T[0] + ' ' + T[1] + ' ' + toWylie(T[1]))
-			}
-		}
-	}
-}
-require('fs').writeFileSync('fail.txt', fails.join('\n'))
-console.log('fromWylie(), pass:', pass, 'fail:', fail)
-console.log('toWylie(), pass:', pass1, 'fail:', fail1)
-//console.log(toWylie('ཨོཾ'))
-
-*/
