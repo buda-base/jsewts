@@ -3,14 +3,17 @@ function out(s) {
 	console.log(++out_x +'\t'+ s)
 }
 
-require('./Wylie.js')
-//require('./towylie.js')
-initHashes()
 var A = require('fs').readFileSync('test.txt').toString().split('\n')
 var Ai = 0
 
-var w = new Wylie(true, false, false, true)
-var w2 = new Wylie(true, true, false, true)
+var w = require('./wylie.js')
+w.setopt({check: true, check_strict: false, print_warnings: false, fix_spacing: true})
+
+delete require.cache[require.resolve('./wylie.js')]
+
+var w2 = require('./wylie.js')
+w2.setopt({check: true, check_strict: true, print_warnings: false, fix_spacing: true})
+
 var l = ""
 var tests = 0
 var fails = 0
