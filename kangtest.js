@@ -16,6 +16,10 @@ function compare(R, a, b) {
 }
 
 var dir = 'Y:/wilye/kangyur/'
+try { fs.readFileSync(dir + 'LICENSE') } catch(e) {
+	console.log('Kangyur LICENSE file not found, must be wrong directory, please fix the line 18.')
+	return
+}
 var volumes = fs.readdirSync(dir).filter(function (x) { return parseInt(x) > 0 })
 var files = []
 for (v in volumes) {
