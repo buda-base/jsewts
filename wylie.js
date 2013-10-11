@@ -1529,34 +1529,6 @@ exports.fromWylie = function(str, warns) {
 		return out
 	}
 	
-	// A class to encapsulate an analyzed tibetan stack, while converting Unicode to Wylie.
-ToWylieStack = function() {
-	this.top = ''
-	this.stack = []
-	this.caret = false
-	this.vowels = []
-	this.finals = []
-	this.finals_found = newHashMap()
-	this.visarga = false
-	this.cons_str = ''
-	this.single_cons = ''
-	this.prefix = false
-	this.suffix = false
-	this.suff2 = false
-	this.dot = false
-	this.tokens_used = 0
-	this.warns = []
-	return this
-}
-
-// A class to encapsulate the return value of toWylieOneTsekbar.
-ToWylieTsekbar = function() {
-	this.wylie = ''
-	this.tokens_used = 0
-	this.warns = []
-	return this
-}
-
 	// given a character, return a string like "\\uxxxx", with its code in hex
 function formatHex(t) { //char
 		// not compatible with GWT...
