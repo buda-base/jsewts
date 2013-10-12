@@ -1,6 +1,8 @@
-﻿var opt = {check:false, check_strict:false, print_warnings:false, fix_spacing:false}
+if (typeof define !== 'function') {  var define = require('amdefine')(module); } //for node.js
+define([],function () {
+var opt = { check:false, check_strict:false, print_warnings:false, fix_spacing:false }
 
-exports.setopt = function(arg_opt) {
+function setopt(arg_opt) {
 	for (i in arg_opt) opt[i] = arg_opt[i]
 	if (opt.check_strict && !opt.check) { 
 		throw 'check_strict requires check.'
@@ -1424,7 +1426,7 @@ function fromWylieOneStack(tokens, i) {
 }
 
 	// Converts a Wylie (EWTS) string to unicode.  If 'warns' is not 'null', puts warnings into it.
-exports.fromWylie = function(str, warns) {
+function fromWylie(str, warns) {
 		var out = '', line = 1, units = 0, i = 0
 		if (opt.fix_spacing) { str = str.replace(/^\s+/, '') }
 		var tokens = splitIntoTokens(str);
@@ -1626,7 +1628,7 @@ function toWylieOneTsekbar(str, len, i) {
 	// put it all together
 	var out = ''
 	for (var si = 0; si < stacks.length; si++) out += putStackTogether(stacks[si])
-	var ret = ToWylieTsekbar();
+	var ret = new ToWylieTsekbar();
 	ret.wylie = out;
 	ret.tokens_used = i - orig_i;
 	ret.warns = warns;
@@ -1751,7 +1753,7 @@ function putStackTogether(st) {
 	//
 	// To get the warnings, call getWarnings() afterwards.
 
-exports.toWylie = function(str, warns, escape) {
+function toWylie(str, warns, escape) {
 	if (escape == undefined) escape = true
 	var out = ''
 	var line = 1
@@ -1845,5 +1847,14 @@ exports.toWylie = function(str, warns, escape) {
 	}
 	return out;
 }
-
+	return {
+		fromWylie: fromWylie,
+		toWylie: toWylie,
+		setopt: setopt,
+		getopt: function() { return opt },
+		five: function() {
+			return 555;
+		}
+	}
+});
 

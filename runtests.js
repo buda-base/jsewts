@@ -6,11 +6,9 @@ function out(s) {
 var A = require('fs').readFileSync('test.txt').toString().split('\n')
 var Ai = 0
 
-var w = require('./wylie.js')
+var w = require('./wylie')
 w.setopt({check: true, check_strict: false, print_warnings: false, fix_spacing: true})
-
 delete require.cache[require.resolve('./wylie.js')]
-
 var w2 = require('./wylie.js')
 w2.setopt({check: true, check_strict: true, print_warnings: false, fix_spacing: true})
 
