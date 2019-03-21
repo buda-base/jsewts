@@ -1,5 +1,5 @@
 ﻿fs = require('fs')
-w = require('./wylie')
+w = require('../src/wylie')
 w.setopt({fix_spacing: false})
 
 function compare(R, a, b) {
@@ -15,7 +15,7 @@ function compare(R, a, b) {
 	}
 }
 
-var dir = 'Y:/wilye/kangyur/'
+var dir = '../'
 try { fs.readFileSync(dir + 'LICENSE') } catch(e) {
 	console.log('Kangyur LICENSE file not found, must be wrong directory, please fix the line 18.')
 	return
@@ -24,7 +24,7 @@ var volumes = fs.readdirSync(dir).filter(function (x) { return parseInt(x) > 0 }
 var files = []
 for (v in volumes) {
 	var f = fs.readdirSync(dir + volumes[v])
-	for (var i = 0; i < f.length; i++) 
+	for (var i = 0; i < f.length; i++)
 		if (f[i].indexOf('.xml') > 0)
 			files.push(dir + volumes[v] + '/' + f[i])
 }

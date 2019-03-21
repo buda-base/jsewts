@@ -1,10 +1,9 @@
-if (typeof define !== 'function') {  var define = require('amdefine')(module); } //for node.js
-define([],function () {
+
 var opt = { check:false, check_strict:false, print_warnings:false, fix_spacing:false }
 
 function setopt(arg_opt) {
 	for (i in arg_opt) opt[i] = arg_opt[i]
-	if (opt.check_strict && !opt.check) { 
+	if (opt.check_strict && !opt.check) {
 		throw 'check_strict requires check.'
 	}
 }
@@ -832,7 +831,7 @@ m_tib_stacks.add("zh+w");
 
 // a map used to split the input string into tokens for fromWylie().
 // all letters which start tokens longer than one letter are mapped to the max length of
-// tokens starting with that letter.  
+// tokens starting with that letter.
 var m_tokens_start = new newHashMap();
 m_tokens_start.put('S', 2);
 m_tokens_start.put('/', 2);
@@ -921,7 +920,7 @@ function consonantString(tokens, i) { // strings, int
 	return out.join("+");
 }
 
-// Looking from i backwards within tokens, at most up to orig_i, returns as 
+// Looking from i backwards within tokens, at most up to orig_i, returns as
 // many consonants as it finds, up to and not including the next vowel or
 // punctuation.  Skips the caret "^".
 // Returns: a string of consonants (in forward order) joined by "+" signs.
@@ -973,13 +972,13 @@ var ToWylieTsekbar = function() {
 }
 
 // Converts successive stacks of Wylie into unicode, starting at the given index
-// within the array of tokens. 
-// 
+// within the array of tokens.
+//
 // Assumes that the first available token is valid, and is either a vowel or a consonant.
 // Returns a WylieTsekbar object
 // HELPER CLASSES AND STRUCTURES
 var State = { PREFIX: 0, MAIN: 1, SUFF1: 2, SUFF2: 3, NONE: 4 }
-	// split a string into Wylie tokens; 
+	// split a string into Wylie tokens;
 	// make sure there is room for at least one null element at the end of the array
 var splitIntoTokens = function(str) {
 	var tokens = [] // size = str.length + 2
@@ -1116,13 +1115,13 @@ function fromWylieOneTsekbar(tokens, i) { // (str, int)
 	// the type of token that we are expecting next in the input stream
 	//   - PREFIX : expect a prefix consonant, or a main stack
 	//   - MAIN   : expect only a main stack
-	//   - SUFF1  : expect a 1st suffix 
+	//   - SUFF1  : expect a 1st suffix
 	//   - SUFF2  : expect a 2nd suffix
 	//   - NONE   : expect nothing (after a 2nd suffix)
 	//
 	// the state machine is actually more lenient than this, in that a "main stack" is allowed
 	// to come at any moment, even after suffixes.  this is because such syllables are sometimes
-	// found in abbreviations or other places.  basically what we check is that prefixes and 
+	// found in abbreviations or other places.  basically what we check is that prefixes and
 	// suffixes go with what they are attached to.
 	//
 	// valid tsek-bars end in one of these states: SUFF1, SUFF2, NONE
@@ -1183,7 +1182,7 @@ function fromWylieOneTsekbar(tokens, i) { // (str, int)
 			consonants.push(stack.single_consonant);
 			if (isSuff2(stack.single_consonant)) {
 				if (!suff2(stack.single_consonant, prev_cons)) {
-					warns.push("Second suffix \"" + stack.single_consonant 
+					warns.push("Second suffix \"" + stack.single_consonant
 					+ "\" does not occur after \"" + prev_cons + "\".");
 				}
 			} else {
@@ -1200,12 +1199,12 @@ function fromWylieOneTsekbar(tokens, i) { // (str, int)
 	warns.push("Vowel expected after \"" + stack.single_consonant + "\".");
 	}
 
-	// check root consonant placement only if there were no warnings so far, and the syllable 
-	// looks ambiguous.  not many checks are needed here because the previous state machine 
+	// check root consonant placement only if there were no warnings so far, and the syllable
+	// looks ambiguous.  not many checks are needed here because the previous state machine
 	// already takes care of most illegal combinations.
 	if (opt.check && warns.length == 0 && check_root && root_idx >= 0) {
 		// 2 letters where each could be prefix/suffix: root is 1st
-		if (consonants.length == 2 && root_idx != 0 
+		if (consonants.length == 2 && root_idx != 0
 		&& prefix(consonants[0], consonants[1]) && isSuffix(consonants[1]))
 		{
 			warns.push("Syllable should probably be \"" + consonants[0] + "a" + consonants[1] + "\".");
@@ -1268,7 +1267,7 @@ function fromWylieOneStack(tokens, i) {
 	}
 	// main consonant + stuff underneath.
 	// this is usually executed just once, but the "+" subjoining operator makes it come back here
-	MAIN: 
+	MAIN:
 	while (true) {
 		// main consonant (or a "a" after a "+")
 		t = tokens[i];
@@ -1295,7 +1294,7 @@ function fromWylieOneStack(tokens, i) {
 			for (var z = 0; z < 2; z++) {
 				t2 = tokens[i];
 				if (t2 != null && isSubscript(t2)) {
-					// lata does not occur below multiple consonants 
+					// lata does not occur below multiple consonants
 					// (otherwise we mess up "brla" = "b.r+la")
 					if (t2 == "l" && consonants > 1) break;
 					// full stack checking (disabled by "+")
@@ -1322,7 +1321,7 @@ function fromWylieOneStack(tokens, i) {
 			}
 		}
 
-		// caret (^) can come anywhere in Wylie but in Unicode we generate it at the end of 
+		// caret (^) can come anywhere in Wylie but in Unicode we generate it at the end of
 		// the stack but before vowels if it came there (seems to be what OpenOffice expects),
 		// or at the very end of the stack if that's how it was in the Wylie.
 		if (caret > 0) {
@@ -1347,7 +1346,7 @@ function fromWylieOneStack(tokens, i) {
 		if (t != null && t == ("+")) {
 			i++;
 			plus = true;
-			// sanity check: next token must be vowel or subjoinable consonant.  
+			// sanity check: next token must be vowel or subjoinable consonant.
 			t = tokens[i];
 			if (t == null || (vowel(t) == null && subjoined(t) == null)) {
 				if (opt.check) warns.push("Expected vowel or consonant after \"+\".");
@@ -1388,7 +1387,7 @@ function fromWylieOneStack(tokens, i) {
 	}
 	// if next is a dot "." (stack separator), skip it.
 	if (tokens[i] != null && tokens[i] == (".")) i++;
-	// if we had more than a consonant and no vowel, and no explicit "+" joining, backtrack and 
+	// if we had more than a consonant and no vowel, and no explicit "+" joining, backtrack and
 	// return the 1st consonant alone
 	if (consonants > 1 && vowel_found == null) {
 		if (plus) {
@@ -1530,7 +1529,7 @@ function fromWylie(str, warns) {
 		if (units == 0) warn(warns, "No Tibetan characters found!");
 		return out
 	}
-	
+
 	// given a character, return a string like "\\uxxxx", with its code in hex
 function formatHex(t) { //char
 		// not compatible with GWT...
@@ -1576,7 +1575,7 @@ function toWylieOneTsekbar(str, len, i) {
 	var orig_i = i;
 	var warns = [];
 	var stacks = [];// ArrayList<ToWylieStack>;
-	ITER: 
+	ITER:
 	while (true) {
 		var st = toWylieOneStack(str, len, i);
 		stacks.push(st);
@@ -1593,11 +1592,11 @@ function toWylieOneTsekbar(str, len, i) {
 		var cs = stacks[1].cons_str.replace(/\+w/g, "")
 		if (prefix(stacks[0].single_cons, cs)) stacks[0].prefix = true;
 	}
-	if (stacks.length > 1 && stacks[last].single_cons != null 
+	if (stacks.length > 1 && stacks[last].single_cons != null
 	&& isSuffix(stacks[last].single_cons)) {
 		stacks[last].suffix = true;
 	}
-	if (stacks.length > 2 && stacks[last].single_cons != null 
+	if (stacks.length > 2 && stacks[last].single_cons != null
 	&& stacks[last - 1].single_cons != null
 	&& isSuffix(stacks[last - 1].single_cons)
 	&& suff2(stacks[last].single_cons, stacks[last - 1].single_cons)) {
@@ -1623,7 +1622,7 @@ function toWylieOneTsekbar(str, len, i) {
 		stacks[root + 1].suff2 = false
 	}
 	// if the prefix together with the main stack could be mistaken for a single stack, add a "."
-	if (stacks[0].prefix && tib_stack(stacks[0].single_cons + "+" + stacks[1].cons_str)) 
+	if (stacks[0].prefix && tib_stack(stacks[0].single_cons + "+" + stacks[1].cons_str))
 		stacks[0].dot = true;
 	// put it all together
 	var out = ''
@@ -1634,7 +1633,7 @@ function toWylieOneTsekbar(str, len, i) {
 	ret.warns = warns;
 	return ret;
 }
-	 
+
 // Unicode to Wylie: one stack at a time
 function toWylieOneStack(str, len, i) {
 	var orig_i = i;
@@ -1683,7 +1682,7 @@ function toWylieOneStack(str, len, i) {
 				if (ffinal == null) ffinal = o;
 				// check for invalid combinations
 				if (st.finals_found.containsKey(klass)) {
-					st.warns.push("Final sign \"" + o 
+					st.warns.push("Final sign \"" + o
 					+ "\" should not combine with found after final sign \"" + ffinal + "\".");
 				} else {
 					st.finals_found.put(klass, o);
@@ -1711,7 +1710,7 @@ function toWylieOneStack(str, len, i) {
 	}
 	st.cons_str = st.stack.join("+");
 	// if this is a single consonant, keep track of it (useful for prefix/suffix analysis)
-	if (st.stack.length == 1 && st.stack[0] != ("a") && !st.caret 
+	if (st.stack.length == 1 && st.stack[0] != ("a") && !st.caret
 	&& st.vowels.length == 0 && st.finals.length == 0) {
 		st.single_cons = st.cons_str;
 	}
@@ -1847,7 +1846,7 @@ function toWylie(str, warns, escape) {
 	}
 	return out;
 }
-	return {
+	export default {
 		fromWylie: fromWylie,
 		toWylie: toWylie,
 		setopt: setopt,
@@ -1856,5 +1855,3 @@ function toWylie(str, warns, escape) {
 			return 555;
 		}
 	}
-});
-

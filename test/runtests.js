@@ -3,13 +3,13 @@ function out(s) {
 	console.log(++out_x +'\t'+ s)
 }
 
-var A = require('fs').readFileSync('test.txt').toString().split('\n')
+var A = require('fs').readFileSync(process.env.PWD+'/test/test.txt').toString().split('\n')
 var Ai = 0
 
-var w = require('./wylie')
+var w = require('../src/wylie.js')
 w.setopt({check: true, check_strict: false, print_warnings: false, fix_spacing: true})
-delete require.cache[require.resolve('./wylie.js')]
-var w2 = require('./wylie.js')
+delete require.cache[require.resolve('../src/wylie.js')]
+var w2 = require('../src/wylie.js')
 w2.setopt({check: true, check_strict: true, print_warnings: false, fix_spacing: true})
 
 var l = ""

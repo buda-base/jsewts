@@ -1,0 +1,33 @@
+{
+  "name": "wylie",
+  "version": "1.0.0",
+  "description": "wylie transliteration port from JAVA version",
+  "main": "src/wylie.js",
+  "scripts": {
+    "start": "serve demo",
+    "test": "nodejs test/runtests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/buda-base/wylie.git"
+  },
+  "keywords": [
+    "wylie",
+    "transliteration",
+    "javascript",
+    "es6"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/buda-base/wylie/issues"
+  },
+  "homepage": "https://github.com/buda-base/wylie#readme",
+  "dependencies": {
+    "amdefine": "^1.0.1",
+    "jest": "^24.5.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.4.0"
+  }
+}

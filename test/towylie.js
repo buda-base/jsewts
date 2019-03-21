@@ -1,6 +1,6 @@
-﻿require('./Wylie')
+﻿require('../src/wylie')
 fs=require('fs')
-w = require('./wylie')
+w = require('../src/wylie')
 w.setopt({fix_spacing: false})
 s=fs.readFileSync('kang.txt', 'utf-8').toString()
 s = w.toWylie(s)
