@@ -1,6 +1,6 @@
 
 
-import wylie from "./src/wylie.es6.js" ;
+import wylie from "./src/wylie.js" ;
 
 console.log("module loaded",typeof wylie.fromWylie)
 

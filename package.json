@@ -5,7 +5,7 @@
   "main": "src/wylie.js",
   "scripts": {
     "start": "serve demo",
-    "test": "nodejs test/runtests.js"
+    "test": "yarn jest"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/buda-base/wylie#readme",
   "dependencies": {
+    "@babel/core": "^7.4.0",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
     "amdefine": "^1.0.1",
     "jest": "^24.5.0"
   },

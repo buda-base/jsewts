@@ -8,4 +8,4 @@ to run demo:
 `yarn start`
 
 to execute tests:
-`yarn test`
+`yarn install && yarn test`

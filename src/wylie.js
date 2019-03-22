@@ -1,10 +1,8 @@
-if (typeof define !== 'function') {  var define = $__amdefine(module); } //for node.js
-import $__amdefine from 'amdefine';
 
 var opt = { check:false, check_strict:false, print_warnings:false, fix_spacing:false }
 
 function setopt(arg_opt) {
-	for (i in arg_opt) opt[i] = arg_opt[i]
+	for (let i in arg_opt) opt[i] = arg_opt[i]
 	if (opt.check_strict && !opt.check) {
 		throw 'check_strict requires check.'
 	}
@@ -1848,7 +1846,8 @@ function toWylie(str, warns, escape) {
 	}
 	return out;
 }
-	export default {
+
+export default {
 		fromWylie: fromWylie,
 		toWylie: toWylie,
 		setopt: setopt,
