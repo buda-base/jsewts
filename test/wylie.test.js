@@ -1,4 +1,4 @@
-import w from '../src/wylie.js'
+import w from '../src/jsewts.js'
 
 ﻿var out_x = 0
 function out(s) {

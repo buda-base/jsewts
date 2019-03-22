@@ -1,28 +1,27 @@
 {
-  "name": "wylie",
+  "name": "jsewts",
   "version": "1.0.0",
   "description": "Tibetan EWTS / Unicode converter",
-  "main": "src/wylie.js",
+  "main": "src/jsewts.js",
   "scripts": {
     "start": "serve demo",
     "test": "yarn jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/buda-base/wylie.git"
+    "url": "git+https://github.com/buda-base/jsewts.git"
   },
   "keywords": [
-    "wylie",
+    "ewts",
     "transliteration",
-    "javascript",
-    "es6"
+    "Tibetan"
   ],
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/buda-base/wylie/issues"
+    "url": "https://github.com/buda-base/jsewts/issues"
   },
-  "homepage": "https://github.com/buda-base/wylie",
+  "homepage": "https://github.com/buda-base/jsewts",
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/plugin-proposal-class-properties": "^7.4.0",

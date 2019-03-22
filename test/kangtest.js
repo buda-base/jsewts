@@ -1,5 +1,5 @@
 ﻿fs = require('fs')
-w = require('../src/wylie')
+w = require('../src/jsewts')
 w.setopt({fix_spacing: false})
 
 function compare(R, a, b) {

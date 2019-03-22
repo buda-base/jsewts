@@ -1,12 +1,12 @@
-import wylie from "./src/wylie.js" ;
+import jsewts from "./src/jsewts.js" ;
 
-console.log("module loaded",typeof wylie.fromWylie)
+console.log("module loaded",typeof jsewts.fromWylie)
 
 window.buttonToWylie = () => {
-   t2.value = wylie.toWylie(t1.value)
+   t2.value = jsewts.toWylie(t1.value)
 }
 
 window.buttonFromWylie = () => {
-   var s = wylie.fromWylie(t2.value)
+   var s = jsewts.fromWylie(t2.value)
    t3.value = s
 }
