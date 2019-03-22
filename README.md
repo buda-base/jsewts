@@ -1,8 +1,8 @@
-wylie
+wylie.js
 =====
 
-wylie transliteration port from JAVA version
-http://www.thlib.org/reference/transliteration/wyconverter.php
+Tibetan [EWTS](http://www.thlib.org/reference/transliteration/#!essay=/thl/ewts/) / Unicode conversion library. Code is (almost) a copy of the [Java version](https://github.com/buda-base/ewts-converter).
+
 
 to run demo:
 `yarn start`

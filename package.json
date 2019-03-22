@@ -1,7 +1,7 @@
 {
   "name": "wylie",
   "version": "1.0.0",
-  "description": "wylie transliteration port from JAVA version",
+  "description": "Tibetan EWTS / Unicode converter",
   "main": "src/wylie.js",
   "scripts": {
     "start": "serve demo",
