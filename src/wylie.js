@@ -184,6 +184,7 @@ m_final_uni.put("~X", 	"\u0f35");
 m_final_uni.put("H", 	"\u0f7f");
 m_final_uni.put("?", 	"\u0f84");
 m_final_uni.put("^", 	"\u0f39");
+m_final_uni.put("&",    "\u0f85");
 
 // final symbols organized by class
 var m_final_class = new newHashMap();
@@ -195,6 +196,7 @@ m_final_class.put("~X", "X");
 m_final_class.put("H", 	"H");
 m_final_class.put("?", 	"?");
 m_final_class.put("^", 	"^");
+m_final_class.put("&", "&");
 
 // other stand-alone symbols
 var m_other = new newHashMap();
@@ -540,20 +542,26 @@ m_suff2.put("d", tmpSet);
 
 // root letter index for very ambiguous three-stack syllables
 var m_ambiguous_key = new newHashMap();
-m_ambiguous_key.put("dgs", 	1);
-m_ambiguous_key.put("dms", 	1);
-m_ambiguous_key.put("'gs", 	1);
-m_ambiguous_key.put("mngs", 	0);
-m_ambiguous_key.put("bgs", 	0);
-m_ambiguous_key.put("dbs", 	1);
+m_ambiguous_key.put("dgs", 1);
+m_ambiguous_key.put("dms", 1);
+m_ambiguous_key.put("dngs", 1);
+m_ambiguous_key.put("'gs", 1);
+m_ambiguous_key.put("'bs", 1);
+m_ambiguous_key.put("mngs", 0);
+m_ambiguous_key.put("mgs", 0);
+m_ambiguous_key.put("bgs", 0);
+m_ambiguous_key.put("dbs", 1);
 
 var m_ambiguous_wylie = new newHashMap();
-m_ambiguous_wylie.put("dgs", 	"dgas");
-m_ambiguous_wylie.put("dms", 	"dmas");
-m_ambiguous_wylie.put("'gs", 	"'gas");
-m_ambiguous_wylie.put("mngs", 	"mangs");
-m_ambiguous_wylie.put("bgs", 	"bags");
-m_ambiguous_wylie.put("dbs", 	"dbas");
+m_ambiguous_wylie.put("dgs", "dgas");
+m_ambiguous_wylie.put("dngs", "dngas");
+m_ambiguous_wylie.put("dms", "dmas");
+m_ambiguous_wylie.put("'gs", "'gas");
+m_ambiguous_wylie.put("'bs", "'bas");
+m_ambiguous_wylie.put("mngs", "mangs");
+m_ambiguous_wylie.put("mgs", "mags");
+m_ambiguous_wylie.put("bgs", "bags");
+m_ambiguous_wylie.put("dbs", "dbas");
 
 // *** Unicode to Wylie mappings ***
 
@@ -682,6 +690,7 @@ m_tib_final_wylie.put('\u0f35', 	"~X");
 m_tib_final_wylie.put('\u0f39', 	"^");
 m_tib_final_wylie.put('\u0f7f', 	"H");
 m_tib_final_wylie.put('\u0f84', 	"?");
+m_tib_final_wylie.put('\u0f85',     "&");
 
 // final symbols by class
 var m_tib_final_class = new newHashMap();
@@ -693,6 +702,7 @@ m_tib_final_class.put('\u0f35', 	"X");
 m_tib_final_class.put('\u0f39', 	"^");
 m_tib_final_class.put('\u0f7f', 	"H");
 m_tib_final_class.put('\u0f84', 	"?");
+m_tib_final_class.put('\u0f85',     "&");
 
 // special characters introduced by ^
 var m_tib_caret = new newHashMap();
@@ -1758,11 +1768,11 @@ function toWylie(str, warns, escape) {
 	var line = 1
 	var units = 0
 	// globally search and replace some deprecated pre-composed Sanskrit vowels
-	str = str.replace(/\u0f76/g, "\u0fb2\u0f80")
-	str = str.replace(/\u0f77/g, "\u0fb2\u0f71\u0f80")
-	str = str.replace(/\u0f78/g, "\u0fb3\u0f80")
-	str = str.replace(/\u0f79/g, "\u0fb3\u0f71\u0f80")
-	str = str.replace(/\u0f81/g, "\u0f71\u0f80")
+	str = str.replace(/\u0f76/g, "\u0fb2\u0f80");
+	str = str.replace(/\u0f77/g, "\u0fb2\u0f71\u0f80");
+	str = str.replace(/\u0f78/g, "\u0fb3\u0f80");
+	str = str.replace(/\u0f79/g, "\u0fb3\u0f71\u0f80");
+	str = str.replace(/\u0f81/g, "\u0f71\u0f80");
 	var i = 0
 	var len = str.length
 	// iterate over the string, codepoint by codepoint
