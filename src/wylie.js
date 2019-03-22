@@ -83,8 +83,6 @@ m_consonant.put("w",    "\u0f5d");
 m_consonant.put("zh",   "\u0f5e");
 m_consonant.put("z",    "\u0f5f");
 m_consonant.put("'",    "\u0f60");
-m_consonant.put("\u2018",   "\u0f60");  // typographic quotes
-m_consonant.put("\u2019",   "\u0f60");
 m_consonant.put("y",    "\u0f61");
 m_consonant.put("r",    "\u0f62");
 m_consonant.put("l",    "\u0f63");
@@ -144,8 +142,6 @@ m_subjoined.put("w",    "\u0fad");
 m_subjoined.put("zh",   "\u0fae");
 m_subjoined.put("z",    "\u0faf");
 m_subjoined.put("'",    "\u0fb0");
-m_subjoined.put("\u2018",   "\u0fb0");  // typographic quotes
-m_subjoined.put("\u2019",   "\u0fb0");
 m_subjoined.put("y",    "\u0fb1");
 m_subjoined.put("r",    "\u0fb2");
 m_subjoined.put("l",    "\u0fb3");
@@ -1225,8 +1221,6 @@ function fromWylieOneTsekbar(tokens, i) { // (str, int)
             suff2("s", consonants[1]) && consonants[2] == "s")
         {
             var cc = consonants.join("");
-            cc = cc.replace(/\u2018/g, '\'');
-            cc = cc.replace(/\u2019/g, '\'');   // typographical quotes
             var expect_key = ambiguous_key(cc);
     //      console.log('typeof expect_key', typeof expect_key)
             if (expect_key != null && expect_key != root_idx) {
@@ -1434,13 +1428,29 @@ function fromWylieOneStack(tokens, i) {
     return ret;
 }
 
-    // Converts a Wylie (EWTS) string to unicode.  If 'warns' is not 'null', puts warnings into it.
+function sloppyRepl(str) {
+    str.replace("[ʼʹ‘’ʾ]", "'");
+    str.replace(" ([\(0-9])", "_$1");
+    str.replace("([_\)\/]) ", "$1_");
+    str.replace("G", "g");
+    str.replace("C", "c");
+    str.replace("B", "b");
+    str.replace("L", "l");
+    str.replace("P", "p");
+    str.replace("Z", "z");
+    return str;
+}
+
+// Converts a Wylie (EWTS) string to unicode.  If 'warns' is not 'null', puts warnings into it.
 function fromWylie(str, warns, sloppy) {
-    if (sloppy === undefined) sloppy = false;
+    if (sloppy) {
+        str = sloppyRepl(str);
+    }
     var out = '', line = 1, units = 0, i = 0;
-    if (opt.fix_spacing) { str = str.replace(/^\s+/, ''); }
+    if (opt.fix_spacing || sloppy) { str = str.replace(/^\s+/, ''); }
     var tokens = splitIntoTokens(str);
-    ITER:while (tokens[i] != null) {
+    ITER:
+    while (tokens[i] != null) {
         var t = tokens[i], o = null
         // [non-tibetan text] : pass through, nesting brackets
         if (t == "[") {
@@ -1764,7 +1774,7 @@ function putStackTogether(st) {
     // To get the warnings, call getWarnings() afterwards.
 
 function toWylie(str, warns, escape) {
-    if (escape == undefined) escape = true
+    if (escape === undefined) escape = true;
     var out = ''
     var line = 1
     var units = 0
