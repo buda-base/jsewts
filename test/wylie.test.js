@@ -29,7 +29,7 @@ it("main tests",()=>{
 		if (l.charAt(0) == "#") continue;
 		var a = l.split('\t');
 		if (a.length < 6) {
-			out("Line does not have 6 fields: (" + l + ")");
+			out("Line "+(Ai)+" does not have 6 fields: (" + l + ")");
 			break;
 		}
 		var wylie = a[0];
