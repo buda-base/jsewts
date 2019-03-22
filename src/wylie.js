@@ -1,13 +1,4 @@
 
-var opt = { check:false, check_strict:false, print_warnings:false, fix_spacing:false }
-
-function setopt(arg_opt) {
-    for (let i in arg_opt) opt[i] = arg_opt[i]
-    if (opt.check_strict && !opt.check) {
-        throw 'check_strict requires check.'
-    }
-}
-
 function newHashSet() {
     var x = []
     x.add = function (K) {
@@ -1096,7 +1087,6 @@ function unicodeEscape (warns, line, t) { // [], int, str
 
 function warn(warns, str) {
     if (warns != null) warns.push(str);
-    if (opt.print_warnings) console.log(str);
 }
 
 // warn with line number
@@ -1104,7 +1094,7 @@ function warnl(warns, line, str) {
     warn(warns, "line " + line + ": " + str);
 }
 
-function fromWylieOneTsekbar(tokens, i) { // (str, int)
+function fromWylieOneTsekbar(tokens, i, opts) { // (str, int)
     var orig_i = i
     var t = tokens[i]
     // variables for tracking the state within the syllable as we parse it
@@ -1138,20 +1128,20 @@ function fromWylieOneTsekbar(tokens, i) { // (str, int)
     while (t != null && (vowel(t) != null || consonant(t) != null) && !visarga) {
         // translate a stack
         if (stack != null) prev_cons = stack.single_consonant;
-        stack = fromWylieOneStack(tokens, i);
+        stack = fromWylieOneStack(tokens, i, opts);
         i += stack.tokens_used;
         t = tokens[i];
         out += stack.uni_string;
         warns = warns.concat(stack.warns);
         visarga = stack.visarga;
-        if (!opt.check) continue;
+        if (!opts.check) continue;
         // check for syllable structure consistency by iterating a simple state machine
         // - prefix consonant
         if (state == State.PREFIX && stack.single_consonant != null) {
             consonants.push(stack.single_consonant);
             if (isPrefix(stack.single_consonant)) {
             var next = t;
-            if (opt.check_strict) next = consonantString(tokens, i);
+            if (opts.check_strict) next = consonantString(tokens, i);
             if (next != null && !prefix(stack.single_consonant, next)) {
                 next = next.replace(/\+/g, "");
                 warns.push("Prefix \"" + stack.single_consonant + "\" does not occur before \"" + next + "\".");
@@ -1177,7 +1167,7 @@ function fromWylieOneTsekbar(tokens, i) { // (str, int)
         } else if (state == State.SUFF1) {
             consonants.push(stack.single_consonant);
             // check this one only in strict mode b/c it trips on lots of Skt stuff
-            if (opt.check_strict) {
+            if (opts.check_strict) {
                 if (!isSuffix(stack.single_consonant)) {
                     warns.push("Invalid suffix consonant: \"" + stack.single_consonant + "\".");
                 }
@@ -1208,7 +1198,7 @@ function fromWylieOneTsekbar(tokens, i) { // (str, int)
     // check root consonant placement only if there were no warnings so far, and the syllable
     // looks ambiguous.  not many checks are needed here because the previous state machine
     // already takes care of most illegal combinations.
-    if (opt.check && warns.length == 0 && check_root && root_idx >= 0) {
+    if (opts.check && warns.length == 0 && check_root && root_idx >= 0) {
         // 2 letters where each could be prefix/suffix: root is 1st
         if (consonants.length == 2 && root_idx != 0
         && prefix(consonants[0], consonants[1]) && isSuffix(consonants[1]))
@@ -1240,7 +1230,7 @@ function fromWylieOneTsekbar(tokens, i) { // (str, int)
     // within the array of tokens.
     // Assumes that the first available token is valid, and is either a vowel or a consonant.
     // Returns a WylieStack object.
-function fromWylieOneStack(tokens, i) {
+function fromWylieOneStack(tokens, i, opts) {
     var orig_i = i
     var t = '', t2 = '', o = ''
     var out = ''
@@ -1257,7 +1247,7 @@ function fromWylieOneStack(tokens, i) {
     t = tokens[i]
     t2 = tokens[i + 1]
     if (t2 != null && isSuperscript(t) && superscript(t, t2)) {
-        if (opt.check_strict) {
+        if (opts.check_strict) {
             var next = consonantString(tokens, i + 1);
             if (!superscript(t, next)) {
                 next = next.replace(/\+/g, '')
@@ -1302,14 +1292,14 @@ function fromWylieOneStack(tokens, i) {
                     // (otherwise we mess up "brla" = "b.r+la")
                     if (t2 == "l" && consonants > 1) break;
                     // full stack checking (disabled by "+")
-                    if (opt.check_strict && !plus) {
+                    if (opts.check_strict && !plus) {
                         var prev = consonantStringBackwards(tokens, i-1, orig_i);
                         if (!subscript(t2, prev)) {
                             prev = prev.replace(/\+/g, "");
                             warns.push("Subjoined \"" + t2 + "\" not expected after \"" + prev + "\".");
                         }
                         // simple check only
-                    } else if (opt.check) {
+                    } else if (opts.check) {
                         if (!subscript(t2, t) && !(z == 1 && t2 == ("w") && t == ("y"))) {
                             warns.push("Subjoined \"" + t2 + "\"not expected after \"" + t + "\".");
                         }
@@ -1353,11 +1343,11 @@ function fromWylieOneStack(tokens, i) {
             // sanity check: next token must be vowel or subjoinable consonant.
             t = tokens[i];
             if (t == null || (vowel(t) == null && subjoined(t) == null)) {
-                if (opt.check) warns.push("Expected vowel or consonant after \"+\".");
+                if (opts.check) warns.push("Expected vowel or consonant after \"+\".");
                 break MAIN;
             }
             // consonants after vowels doesn't make much sense but process it anyway
-            if (opt.check) {
+            if (opts.check) {
                 if (vowel(t) == null && vowel_sign != null) {
                     warns.push("Cannot subjoin consonant (" + t + ") after vowel (" + vowel_sign + ") in same stack.");
                 } else if (t == ("a") && vowel_sign != null) {
@@ -1395,7 +1385,7 @@ function fromWylieOneStack(tokens, i) {
     // return the 1st consonant alone
     if (consonants > 1 && vowel_found == null) {
         if (plus) {
-            if (opt.check) warns.push("Stack with multiple consonants should end with vowel.");
+            if (opts.check) warns.push("Stack with multiple consonants should end with vowel.");
         } else {
             i = orig_i + 1;
             consonants = 1;
@@ -1429,25 +1419,33 @@ function fromWylieOneStack(tokens, i) {
 }
 
 function sloppyRepl(str) {
-    str.replace("[ʼʹ‘’ʾ]", "'");
-    str.replace(" ([\(0-9])", "_$1");
-    str.replace("([_\)\/]) ", "$1_");
-    str.replace("G", "g");
-    str.replace("C", "c");
-    str.replace("B", "b");
-    str.replace("L", "l");
-    str.replace("P", "p");
-    str.replace("Z", "z");
+    str = str.replace("[ʼʹ‘’ʾ]", "'");
+    str = str.replace(" ([\(0-9])", "_$1");
+    str = str.replace("([_\)\/]) ", "$1_");
+    str = str.replace("G", "g");
+    str = str.replace("C", "c");
+    str = str.replace("B", "b");
+    str = str.replace("L", "l");
+    str = str.replace("P", "p");
+    str = str.replace("Z", "z");
+    str = str.replace(/^\s+/, '');
     return str;
 }
 
 // Converts a Wylie (EWTS) string to unicode.  If 'warns' is not 'null', puts warnings into it.
-function fromWylie(str, warns, sloppy) {
-    if (sloppy) {
+function fromWylie(str, opts, warns) {
+    if (!warns) {
+        warns = [];
+    }
+    if (!opts) {
+        opts = {
+            sloppy: true
+        };
+    }
+    if (opts.sloppy) {
         str = sloppyRepl(str);
     }
     var out = '', line = 1, units = 0, i = 0;
-    if (opt.fix_spacing || sloppy) { str = str.replace(/^\s+/, ''); }
     var tokens = splitIntoTokens(str);
     ITER:
     while (tokens[i] != null) {
@@ -1486,14 +1484,14 @@ function fromWylie(str, warns, sloppy) {
             i++;
             units++;
             // collapse multiple spaces?
-            if (t == " " && opt.fix_spacing) {
+            if (t == " " && opts.sloppy) {
                 while (tokens[i] != null && tokens[i] == " ") i++;
             }
             continue ITER;
         }
         // vowels & consonants: process tibetan script up to a tsek, punctuation or line noise
         if (vowel(t) != null || consonant(t) != null) {
-            var tb = fromWylieOneTsekbar(tokens, i);
+            var tb = fromWylieOneTsekbar(tokens, i, opts);
             var word = '';
             for (var j = 0; j < tb.tokens_used; j++) {
                 word += (tokens[i+j]);
@@ -1533,7 +1531,7 @@ function fromWylie(str, warns, sloppy) {
             out += t;
             i++;
             // also eat spaces after newlines (optional)
-            if (opt.fix_spacing) {
+            if (opts.sloppy) {
                 while (tokens[i] != null && tokens[i] == " ") i++;
             }
             continue ITER;
@@ -1773,7 +1771,10 @@ function putStackTogether(st) {
     //
     // To get the warnings, call getWarnings() afterwards.
 
-function toWylie(str, warns, escape) {
+function toWylie(str, escape, warns) {
+    if (!warns) {
+        warns = [];
+    }
     if (escape === undefined) escape = true;
     var out = ''
     var line = 1
@@ -1869,11 +1870,6 @@ function toWylie(str, warns, escape) {
 }
 
 export default {
-        fromWylie: fromWylie,
-        toWylie: toWylie,
-        setopt: setopt,
-        getopt: function() { return opt },
-        five: function() {
-            return 555;
-        }
-    }
+    fromWylie: fromWylie,
+    toWylie: toWylie
+}

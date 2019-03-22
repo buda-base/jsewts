@@ -1,5 +1,3 @@
-
-
 import wylie from "./src/wylie.js" ;
 
 console.log("module loaded",typeof wylie.fromWylie)

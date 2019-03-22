@@ -1,5 +1,4 @@
 import w from '../src/wylie.js'
-import w2 from '../src/wylie.js'
 
 ﻿var out_x = 0
 function out(s) {
@@ -9,9 +8,16 @@ function out(s) {
 var A = require('fs').readFileSync(process.env.PWD+'/test/test.txt').toString().split('\n')
 var Ai = 0
 
-w.setopt({check: true, check_strict: false, print_warnings: false, fix_spacing: true})
-//delete require.cache[require.resolve('../src/wylie.js')]
-w2.setopt({check: true, check_strict: true, print_warnings: false, fix_spacing: true})
+var opts1 = {
+    check: true,
+    check_strict: false,
+    sloppy: true
+};
+var opts2 = {
+    check: true,
+    check_strict: true,
+    sloppy: true
+}
 
 it("main tests",()=>{
 
@@ -35,12 +41,12 @@ it("main tests",()=>{
 		tests++;
 		var fail = false;
 		var e = [];
-		var s = w.fromWylie(wylie, e);
+		var s = w.fromWylie(wylie, opts1, e);
 		var e2 = [];
-		var s2 = w2.fromWylie(wylie, e2);
+		var s2 = w.fromWylie(wylie, opts2, e2);
 		// re-encode into wylie
 		var e3 = [];
-		var rewylie = w.toWylie(s, e3, true);
+		var rewylie = w.toWylie(s, true, e3);
 		// and again back into unicode
 		var reuni = w.fromWylie(rewylie);
 		// the two first unicodes must be same
@@ -111,6 +117,6 @@ it("main tests",()=>{
 	}
 	out("Finished running " + tests + " tests, " + fails + " failures.");
 
-	assert(fails).toEqual(0);
+	expect(fails).toEqual(0);
 
 })
