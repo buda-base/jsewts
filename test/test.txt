@@ -105,7 +105,6 @@ bla ma	བླ་མ	0	bla ma	0	0
 a [unfinished [comment]	ཨ་unfinished [comment]	2	a [unfinished \[comment\]]	0	0
 bla   ma   	བླ་མ་	0	bla ma 	0	0
 ﻿bla	བླ	0	bla	0	0
-\u0020\U00000020\u0032\t\i\x\!	  2tix!	2	[  2tix!]	0	0
 a\u01x3a	ཨཨ	2	aa	0	0
 xxx	xxx	2	[xxx]	0	0
 blaxbla	བླxབླ	2	bla[x]bla	0	0
@@ -181,7 +180,7 @@ bde gshegs chos kyi sku mnga’ sras bcas dang//	བདེ་གཤེགས་�
 bde gshegs chos kyi sku mnga' sras bcas dang//	བདེ་གཤེགས་ཆོས་ཀྱི་སྐུ་མངའ་སྲས་བཅས་དང༎	0	bde gshegs chos kyi sku mnga' sras bcas dang//	0	0
 oM ma Ni pad+me hU~M` 	ཨོཾ་མ་ཎི་པདྨེ་ཧཱུྂ་	0	oM ma Ni pad+me hU~M` 	0	0
 oM aHhU~M` badzra gu ru pad+ma sid+dhi hU~M`:	ཨོཾ་ཨཿཧཱུྂ་བཛྲ་གུ་རུ་པདྨ་སིདྡྷི་ཧཱུྂ༔	0	oM aHhU~M` badzra gu ru pad+ma sid+d+hi hU~M`:	0	0
-bla \u0f20\u0fc2	བླ་༠࿂	0	bla 0\u0fc2	0	0
+bla\u0f20\u0fc2	བླ༠࿂	0	bla0\u0fc2	0	0
 bla \u0f73	བླ་ཱི	0	bla \u0f73	1	0
 bla \u0f04	བླ་༄	0	bla @	0	0
 bla \u0f09	བླ་༉	0	bla \u0f09	0	0
@@ -208,4 +207,4 @@ bgrwa	བགྲྭ	1	bgrwa	0	0
 bgrya	བགྲྱ	2	bag+r+ya	0	0
 mand	མནད	0	mnad	1	0
 pand	པནད	0	pand	0	0
-mgas	མགས	0	mgas	1	0
+mags	མགས	0	mags	0	0

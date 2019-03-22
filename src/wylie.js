@@ -1419,9 +1419,9 @@ function fromWylieOneStack(tokens, i, opts) {
 }
 
 function sloppyRepl(str) {
-    str = str.replace("[ʼʹ‘’ʾ]", "'");
-    str = str.replace(" ([\(0-9])", "_$1");
-    str = str.replace("([_\)\/]) ", "$1_");
+    str = str.replace(/[ʼʹ‘’ʾ]/, "'");
+    str = str.replace(/ ([\(0-9])/, "_$1");
+    str = str.replace(/([_\)\/]) /, "$1_");
     str = str.replace("G", "g");
     str = str.replace("C", "c");
     str = str.replace("B", "b");
