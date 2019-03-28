@@ -1873,3 +1873,8 @@ export default {
     fromWylie: fromWylie,
     toWylie: toWylie
 }
+
+if(window)
+{
+   window.jsEWTS = { fromWylie, toWylie }
+}
