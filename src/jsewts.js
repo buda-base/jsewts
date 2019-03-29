@@ -1869,12 +1869,29 @@ function toWylie(str, escape, warns) {
     return out;
 }
 
-export default {
-    fromWylie: fromWylie,
-    toWylie: toWylie
-}
 
-if(window)
-{
-   window.jsEWTS = { fromWylie, toWylie }
-}
+function exportJsEWTS(global) {
+
+   const jsEWTS = {
+       fromWylie: fromWylie,
+       toWylie: toWylie
+   }
+   /*
+    if (typeof define === 'function' && define.amd) {
+        define(function(){ return jsEWTS; });
+    }
+    else
+    */
+    if(typeof exports !== 'undefined'){
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = jsEWTS ;
+        }
+
+        exports.jsEWTS = jsEWTS;
+    }else {
+        if(global) { global.jsEWTS = jsEWTS }
+        if(window) { window.jsEWTS = jsEWTS }
+    }
+};
+
+exportJsEWTS(this);
