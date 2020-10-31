@@ -120,3 +120,8 @@ it("main tests",()=>{
 	expect(fails).toEqual(0);
 
 })
+
+it("issue #1",()=>{
+    expect(w.fromWylie("dad stobs/ phyag rgya/ chos phyag/ mar me/ grong khyer/ sgra chen/ seng ge /sA lu/ rten 'brel/ sor phreng / rgyal po/ 'gyod bsal/ dpal sbas dang rnam dag la sogs theg pa chen po'i mdo/"))
+    .toEqual("དད་སྟོབས། ཕྱག་རྒྱ། ཆོས་ཕྱག། མར་མེ། གྲོང་ཁྱེར། སྒྲ་ཆེན། སེང་གེ་།སཱ་ལུ། རྟེན་འབྲེལ། སོར་ཕྲེང་། རྒྱལ་པོ། འགྱོད་བསལ། དཔལ་སྦས་དང་རྣམ་དག་ལ་སོགས་ཐེག་པ་ཆེན་པོའི་མདོ།");
+})

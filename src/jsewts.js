@@ -1419,15 +1419,15 @@ function fromWylieOneStack(tokens, i, opts) {
 }
 
 function sloppyRepl(str) {
-    str = str.replace(/[ʼʹ‘’ʾ]/, "'");
-    str = str.replace(/ ([\(0-9])/, "_$1");
-    str = str.replace(/([_\)\/]) /, "$1_");
-    str = str.replace("G", "g");
-    str = str.replace("C", "c");
-    str = str.replace("B", "b");
-    str = str.replace("L", "l");
-    str = str.replace("P", "p");
-    str = str.replace("Z", "z");
+    str = str.replace(/[ʼʹ‘’ʾ]/g, "'");
+    str = str.replace(/ ([\(0-9])/g, "_$1");
+    str = str.replace(/([_\)\/]) /g, "$1_");
+    str = str.replace(/G/g, "g");
+    str = str.replace(/C/g, "c");
+    str = str.replace(/B/g, "b");
+    str = str.replace(/L/g, "l");
+    str = str.replace(/P/g, "p");
+    str = str.replace(/Z/g, "z");
     str = str.replace(/^\s+/, '');
     return str;
 }

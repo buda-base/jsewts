@@ -1,6 +1,6 @@
 {
   "name": "jsewts",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tibetan EWTS / Unicode converter",
   "main": "src/jsewts.js",
   "scripts": {
