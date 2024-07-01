@@ -531,7 +531,7 @@ m_suff2.put("d", tmpSet);
 var m_ambiguous_key = new newHashMap();
 m_ambiguous_key.put("dgs", 1);
 m_ambiguous_key.put("dms", 1);
-m_ambiguous_key.put("dngs", 1);
+m_ambiguous_key.put("dngs", 0);
 m_ambiguous_key.put("'gs", 1);
 m_ambiguous_key.put("'bs", 1);
 m_ambiguous_key.put("mngs", 0);
@@ -541,7 +541,7 @@ m_ambiguous_key.put("dbs", 1);
 
 var m_ambiguous_wylie = new newHashMap();
 m_ambiguous_wylie.put("dgs", "dgas");
-m_ambiguous_wylie.put("dngs", "dngas");
+m_ambiguous_wylie.put("dngs", "dangs");
 m_ambiguous_wylie.put("dms", "dmas");
 m_ambiguous_wylie.put("'gs", "'gas");
 m_ambiguous_wylie.put("'bs", "'bas");

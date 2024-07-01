@@ -1,4 +1,5 @@
 # wylie	unicode	warnings	wylie back	warnings	different unicode?
+dangs	དངས	0	dangs	0	0
 a	ཨ	0	a	0	0
 a 	ཨ་	0	a 	0	0
 a     	ཨ་	0	a 	0	0
