@@ -1,8 +1,15 @@
 {
   "name": "jsewts",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Tibetan EWTS / Unicode converter",
   "main": "src/jsewts.js",
+  "type": "commonjs",
+  "files": [
+    "src/",
+    "test/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "start": "serve demo",
     "test": "yarn jest"
@@ -16,18 +23,23 @@
     "transliteration",
     "Tibetan"
   ],
-  "author": "",
+  "author": "Elie Roux (Buddhist Digital Resource Center)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/buda-base/jsewts/issues"
   },
   "homepage": "https://github.com/buda-base/jsewts",
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
-    "@babel/core": "^7.4.0",
-    "@babel/plugin-proposal-class-properties": "^7.4.0",
-    "@babel/plugin-transform-modules-commonjs": "^7.4.0",
-    "amdefine": "^1.0.1",
-    "jest": "^24.5.0",
-    "serve": "^10.1.2"
+    "jest": "^30.0.5",
+    "serve": "^14.2.4",
+    "@babel/core": "*",
+    "@babel/plugin-transform-modules-commonjs": "*",
+    "@babel/plugin-proposal-class-properties": "*"
+  },
+  "dependencies": {
+    "yarn": "^1.22.22"
   }
 }
