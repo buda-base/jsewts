@@ -21,7 +21,7 @@ function normalizeSpaces(s) {
     /([aeiouIAEU]g|[gk][aeiouAEIU]|[;!/|]) +([;!/|])/g,
     (_, g1, g2) => `${g1}_${g2}`
   );
-  s = s.replace(/([;!/|HX]) +/g, (_, g1) => `${g1}_`);
+  s = s.replace(/([;!/|H]) +/g, (_, g1) => `${g1}_`);
   return s;
 }
 
