@@ -2,7 +2,7 @@
 
 /**
  * ALA-LC / DTS ⇄ EWTS conversion helpers
- * Ported from TransConverter.java (BDRC).
+ * Ported from https://github.com/buda-base/ewts-converter/blob/master/src/main/java/io/bdrc/ewtsconverter/TransConverter.java (BDRC).
  *
  * Exposes:
  *   - dtsToEwts(str)

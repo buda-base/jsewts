@@ -1,5 +1,7 @@
 'use strict';
 
+// adapted from https://github.com/OpenPecha/pyewts/blob/master/pyewts/ACIP.py
+
 /**
  * ACIP ⇄ EWTS conversion utilities (standalone)
  * Exposes: ACIPtoEWTS, EWTStoACIPContent

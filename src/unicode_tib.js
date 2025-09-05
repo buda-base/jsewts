@@ -1,5 +1,7 @@
 // tib_unicode.js
 
+// ported from https://github.com/OpenPecha/Botok/blob/master/botok/utils/unicode_normalization.py
+
 // Category enum equivalent
 const Cats = {
   Other: 0,

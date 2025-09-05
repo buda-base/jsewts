@@ -1,3 +1,4 @@
+// ported from https://github.com/buda-base/ewts-converter/blob/master/src/main/java/io/bdrc/ewtsconverter/EwtsConverter.java
 
 function newHashSet() {
     var x = []
