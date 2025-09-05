@@ -33,11 +33,11 @@
     "node": ">=18"
   },
   "devDependencies": {
-    "jest": "^30.0.5",
-    "serve": "^14.2.4",
     "@babel/core": "*",
+    "@babel/plugin-proposal-class-properties": "*",
     "@babel/plugin-transform-modules-commonjs": "*",
-    "@babel/plugin-proposal-class-properties": "*"
+    "jest": "^30.0.5",
+    "serve": "^14.2.4"
   },
   "dependencies": {
     "yarn": "^1.22.22"

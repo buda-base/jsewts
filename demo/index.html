@@ -52,7 +52,7 @@
         
         textarea {
             width: 100%;
-            height: 120px;
+            height: 200px;
             padding: 12px;
             border: 2px solid #ddd;
             border-radius: 4px;
@@ -218,6 +218,7 @@
     <script type="module">
         import { ACIPtoEWTS, EWTStoACIPContent } from './src/acip.js';
         import { dtsToEwts, alalcToEwts, ewtsToAlalc } from './src/alalc.js';
+        import { normalizeUnicode } from './src/unicode_tib.js';
 
         // Make functions globally available (jsEWTS is already global from the script tag)
         window.ACIPtoEWTS = ACIPtoEWTS;
@@ -225,6 +226,7 @@
         window.dtsToEwts = dtsToEwts;
         window.alalcToEwts = alalcToEwts;
         window.ewtsToAlalc = ewtsToAlalc;
+        window.normalizeUnicode = normalizeUnicode;
 
         console.log('All modules loaded successfully');
     </script>
@@ -250,7 +252,18 @@
             }
 
             if (fromFormat === toFormat) {
-                outputTextArea.value = inputText;
+                // Special handling for same format conversions
+                if (fromFormat === 'unicode') {
+                    // Unicode to Unicode: run normalizeUnicode
+                    outputTextArea.value = window.normalizeUnicode(inputText);
+                } else if (fromFormat === 'wylie') {
+                    // EWTS to EWTS: run fromWylie then toWylie (ewts -> unicode -> ewts)
+                    const unicodeText = window.jsEWTS.fromWylie(inputText);
+                    outputTextArea.value = window.jsEWTS.toWylie(unicodeText);
+                } else {
+                    // For other formats, just copy the input
+                    outputTextArea.value = inputText;
+                }
                 return;
             }
 
